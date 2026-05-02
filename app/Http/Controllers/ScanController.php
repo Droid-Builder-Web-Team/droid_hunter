@@ -11,20 +11,22 @@ class ScanController extends Controller
     /**
      * Process the scan from the Core Portal.
      */
-    public function process(Request $request, $droidId, $hash)
+    public function process(Request $request, $id)
     {
         $user = auth()->user();
         $visitorId = $request->cookie('visitor_id');
+        $signature = $request->query('signature');
 
-        // Verify hash matches droidId + secret
-        $expectedHash = hash_hmac('sha256', $droidId, config('services.core_portal.tag_secret'));
+        // Verify signature matches droid ID + secret
+        $secret = config('services.core_portal.tag_secret');
+        $expectedSignature = hash_hmac('sha256', $id, $secret);
         
-        if (!hash_equals($expectedHash, $hash)) {
-            return redirect()->route('registry.index')->with('error', 'Invalid scan tag.');
+        if (!hash_equals($expectedSignature, (string) $signature)) {
+            return redirect()->route('registry.index')->with('error', 'Invalid scan signature.');
         }
 
         // Check if already scanned today (by user or device)
-        $existing = DroidScan::where('droid_id', $droidId)
+        $existing = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {
                 if ($user) {
                     $query->where('user_id', $user->id);
@@ -41,11 +43,11 @@ class ScanController extends Controller
             DroidScan::create([
                 'user_id' => $user->id ?? null,
                 'visitor_id' => $visitorId,
-                'droid_id' => $droidId,
+                'droid_id' => $id,
             ]);
         }
 
-        return redirect()->route('registry.show', $droidId)
+        return redirect()->route('registry.show', $id)
             ->with('success', 'Droid spotted!');
     }
 }

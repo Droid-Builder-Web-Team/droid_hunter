@@ -6,7 +6,7 @@ Route::get('/', function () {
     return redirect()->route('registry.index');
 });
 
-Route::get('/scan/{id}/{hash}', [App\Http\Controllers\ScanController::class, 'process'])->name('scan.process');
+Route::get('/scan/{id}', [App\Http\Controllers\ScanController::class, 'process'])->name('scan.process');
 
 Route::get('/registry', [App\Http\Controllers\RegistryController::class, 'index'])->name('registry.index');
 Route::get('/registry/{id}', [App\Http\Controllers\RegistryController::class, 'show'])->name('registry.show');
