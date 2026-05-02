@@ -29,8 +29,8 @@
                 </div>
 
                 <div style="margin-bottom: 1.5rem;">
-                    <label for="password" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); text-align: left;">Secret Key (Password)</label>
-                    <input type="password" name="password" id="password" required placeholder="Min 8 characters" 
+                    <label for="password" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); text-align: left;">Password</label>
+                    <input type="password" name="password" id="password" required placeholder="Choose a password" 
                            style="width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--accent); background: var(--bg-color); color: white; font-size: 1rem;">
                 </div>
 

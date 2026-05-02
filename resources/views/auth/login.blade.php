@@ -23,7 +23,7 @@
                 </div>
 
                 <div style="margin-bottom: 2rem;">
-                    <label for="password" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); text-align: left;">Secret Key</label>
+                    <label for="password" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); text-align: left;">Password</label>
                     <input type="password" name="password" id="password" required 
                            style="width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--accent); background: var(--bg-color); color: white; font-size: 1rem;">
                 </div>

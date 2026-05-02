@@ -91,24 +91,24 @@
 
             <!-- Password Update -->
             <div class="droid-card" style="padding: 2rem;">
-                <h3 style="margin-top: 0; color: var(--primary);">Update Secret Key</h3>
+                <h3 style="margin-top: 0; color: var(--primary);">Update Password</h3>
                     <form method="POST" action="{{ route('user-password.update') }}">
                         @csrf
                         @method('PUT')
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Current Key</label>
+                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Current Password</label>
                             <input type="password" name="current_password" required style="width: 100%; padding: 0.6rem; border-radius: 0.3rem; border: 1px solid var(--accent); background: var(--bg-color); color: white;">
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">New Key</label>
+                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">New Password</label>
                             <input type="password" name="password" required style="width: 100%; padding: 0.6rem; border-radius: 0.3rem; border: 1px solid var(--accent); background: var(--bg-color); color: white;">
                         </div>
                         <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Confirm New Key</label>
+                            <label style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Confirm New Password</label>
                             <input type="password" name="password_confirmation" required style="width: 100%; padding: 0.6rem; border-radius: 0.3rem; border: 1px solid var(--accent); background: var(--bg-color); color: white;">
                         </div>
                         <button type="submit" style="background: var(--accent); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
-                            UPDATE KEY
+                            UPDATE PASSWORD
                         </button>
                     </form>
                 </div>

@@ -19,8 +19,13 @@ class EnsureVisitorId
 
         if (!$visitorId) {
             $visitorId = (string) \Illuminate\Support\Str::uuid();
+            
+            // Inject into the current request so controllers can see it immediately
+            $request->cookies->add(['visitor_id' => $visitorId]);
+            
             $response = $next($request);
-            // Set cookie for 10 years (5,256,000 minutes)
+            
+            // Set cookie for 10 years
             return $response->withCookie(cookie()->forever('visitor_id', $visitorId));
         }
 
