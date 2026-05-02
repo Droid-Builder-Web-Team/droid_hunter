@@ -87,7 +87,24 @@ class RegistryController extends Controller
 
         // Fetch rich data from Core Portal API
         $response = Http::get(config('services.core_portal.url') . '/api/v1/droids/' . $id);
+        
+        if ($response->failed() || !isset($response->json()['name'])) {
+            return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
+        }
+
         $droid = $response->json();
+
+        // Calculate encounters once here to keep the view clean
+        $encounters = DroidScan::where('droid_id', $id)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->count();
 
         // Assign placeholder for fallback
         $clubName = $droid['club']['name'] ?? 'Generic';
@@ -100,6 +117,6 @@ class RegistryController extends Controller
             default => asset('images/placeholders/astromech.png'),
         };
 
-        return view('registry.show', compact('droid', 'scan'));
+        return view('registry.show', compact('droid', 'scan', 'encounters'));
     }
 }
