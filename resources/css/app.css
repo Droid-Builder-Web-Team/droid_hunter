@@ -98,9 +98,10 @@ a.droid-card:hover {
     z-index: 2;
 }
 
-.rarity-tag.legendary { background: #ff00ff; color: #fff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
-.rarity-tag.rare { background: #ff8c00; color: #fff; }
-.rarity-tag.uncommon { background: #00d4ff; color: #fff; }
+.rarity-tag.legendary { background: #6a4c93; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+.rarity-tag.rare { background: #a6611a; color: #fff; }
+.rarity-tag.uncommon { background: #457b9d; color: #fff; }
+.rarity-tag.common { background: #3d405b; color: #e0e1dd; }
 a.droid-card, a.droid-card:hover, a.droid-card:visited, a.droid-card:active {
     color: var(--text-primary) !important;
     text-decoration: none !important;

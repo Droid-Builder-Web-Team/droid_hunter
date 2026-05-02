@@ -28,18 +28,39 @@
             </div>
 
             <div style="background: var(--accent); padding: 1.5rem; border-radius: 1rem; width: 100%;">
-                <h3 style="margin-top: 0;">Description</h3>
-                <p>{{ $droid['description'] ?? 'No description available for this droid.' }}</p>
-                
-                <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+                <div class="specs-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem;">
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Club</div>
-                        <div style="font-weight: 600;">{{ $droid['club']['name'] ?? 'Unknown' }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Weight</div>
+                        <div style="font-weight: 600;">{{ $droid['specs']['weight'] ?? '?' }} kg</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Rarity</div>
-                        <div style="font-weight: 600; color: var(--secondary);">{{ $droid['rarity'] ?? 'Common' }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Speed</div>
+                        <div style="font-weight: 600;">{{ $droid['specs']['top_speed'] ?? '?' }} m/s</div>
                     </div>
+                    <div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Material</div>
+                        <div style="font-weight: 600;">{{ $droid['specs']['material'] ?? 'Unknown' }}</div>
+                    </div>
+                </div>
+
+                <div class="lore-section" style="margin-bottom: 2rem;">
+                    <h3 style="margin-top: 0; color: var(--primary); font-size: 1.1rem;">Backstory</h3>
+                    <p style="line-height: 1.6; font-size: 0.95rem;">{{ $droid['back_story'] ?: 'This droid has a mysterious past that is yet to be told...' }}</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Origin</div>
+                        <div style="font-weight: 600;">{{ $droid['location']['county'] }}, {{ $droid['location']['country'] }}</div>
+                        <div style="font-size: 0.8rem; color: var(--primary);">{{ $droid['club']['name'] }}</div>
+                    </div>
+                    
+                    <details style="cursor: pointer;">
+                        <summary style="font-size: 0.8rem; color: var(--text-secondary); list-style: none;">[ View Builder Notes ]</summary>
+                        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.5rem; border-left: 3px solid var(--primary);">
+                            {!! nl2br(e($droid['description'])) !!}
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
