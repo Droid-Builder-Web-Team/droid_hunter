@@ -29,18 +29,28 @@ class SocialController extends Controller
 
         Auth::login($user);
 
+        // Claim any guest scans from this device
+        $visitorId = request()->cookie('visitor_id');
+        if ($visitorId) {
+            \App\Models\DroidScan::where('visitor_id', $visitorId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $user->id]);
+        }
+
         // Check if there was a pending scan before login
         if (session()->has('pending_scan')) {
             $droidId = session()->pull('pending_scan');
             
-            DroidScan::updateOrCreate([
+            \App\Models\DroidScan::updateOrCreate([
                 'user_id' => $user->id,
                 'droid_id' => $droidId,
+            ], [
+                'visitor_id' => $visitorId
             ]);
 
             return redirect()->route('registry.show', $droidId)->with('success', 'Logged in and droid added!');
         }
 
-        return redirect()->route('registry.index');
+        return redirect()->route('registry.index')->with('success', 'Logged in! Your collection has been synced.');
     }
 }
