@@ -1,0 +1,1 @@
+{"name":"Droid Hunter PWA","short_name":"DroidHunter","description":"Collect droids at events!","start_url":"/build/","display":"standalone","background_color":"#0a0a0c","theme_color":"#0a0a0c","lang":"en","scope":"/build/","icons":[{"src":"/icons/icon-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/icons/icon-512x512.png","sizes":"512x512","type":"image/png"}]}
