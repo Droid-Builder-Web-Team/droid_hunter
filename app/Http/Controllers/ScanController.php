@@ -47,7 +47,7 @@ class ScanController extends Controller
             ]);
         }
 
-        return redirect()->route('registry.show', $id)
+        return redirect()->route('registry.show', ['id' => $id, 'visitor_id' => $visitorId])
             ->with('success', 'Droid spotted!');
     }
 }
