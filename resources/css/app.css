@@ -101,18 +101,27 @@ a.droid-card:hover {
 .rarity-tag.legendary { background: #ff00ff; color: #fff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
 .rarity-tag.rare { background: #ff8c00; color: #fff; }
 .rarity-tag.uncommon { background: #00d4ff; color: #fff; }
-.rarity-tag.common { background: #2c2c34; color: var(--text-secondary); }
+a.droid-card, a.droid-card:hover, a.droid-card:visited, a.droid-card:active {
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
+}
+
+a.droid-card * {
+    text-decoration: none !important;
+}
 
 .found-badge {
     position: absolute;
-    top: 0.5rem;
-    left: 0.5rem; /* Moved to left to avoid overlapping potential top-right badges */
+    top: 0.8rem;
+    left: 0.8rem;
     background: var(--success);
-    color: var(--bg-color);
-    font-size: 0.6rem;
+    color: var(--bg-color) !important;
+    font-size: 0.65rem;
     font-weight: 800;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.2rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
     text-transform: uppercase;
-    z-index: 3; /* Higher than image and name */
+    z-index: 10; /* Force it to the very top */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    pointer-events: none; /* Let clicks pass through to the link */
 }
