@@ -98,10 +98,11 @@ class RegistryController extends Controller
         }
 
         // Fetch rich data from Core Portal API
-        $response = Http::get(config('services.core_portal.url') . '/api/v1/droids/' . $id);
+        $coreUrl = rtrim(config('services.core_portal.url'), '/');
+        $response = Http::get($coreUrl . '/api/v1/droids/' . $id);
         
         if ($response->failed()) {
-            \Log::error("API Request Failed", ['url' => config('services.core_portal.url') . '/api/v1/droids/' . $id, 'status' => $response->status()]);
+            \Log::error("API Request Failed", ['url' => $coreUrl . '/api/v1/droids/' . $id, 'status' => $response->status()]);
             return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
         }
 
