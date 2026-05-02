@@ -43,6 +43,10 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
+        Fortify::confirmPasswordView(function () {
+            return view('auth.confirm-password');
+        });
+
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
