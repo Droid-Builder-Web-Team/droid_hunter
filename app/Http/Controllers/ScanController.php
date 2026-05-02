@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 class ScanController extends Controller
 {
     /**
+     * Process the scan from the Core Portal.
+     */
     public function process(Request $request, $id)
     {
         $id = (int) $id;
