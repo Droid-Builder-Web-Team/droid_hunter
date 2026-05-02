@@ -23,26 +23,32 @@
 
         <div class="grid">
             @forelse($allDroids as $droid)
-                <div class="droid-card {{ $droid['found'] ? 'found' : 'locked' }}">
-                    @if($droid['found'])
+                @if($droid['found'])
+                    <a href="{{ route('registry.show', $droid['id']) }}" class="droid-card found text-decoration-none">
                         <span class="found-badge">Spotted {{ $droid['encounters'] }}x</span>
-                    @endif
-                    
-                    <img src="{{ $droid['found'] ? (rtrim(config('services.core_portal.url'), '/') . '/storage/droids/' . $droid['id'] . '/image.jpg') : ($droid['placeholder'] ?? '/images/placeholders/astromech.png') }}" 
-                         onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder');"
-                         alt="{{ $droid['name'] }}" 
-                         class="droid-image {{ $droid['found'] ? '' : 'placeholder' }}">
-                    
-                    <div class="droid-name">{{ $droid['name'] }}</div>
-                    
-                    @if(isset($droid['rarity']))
-                        <div class="rarity-tag {{ strtolower($droid['rarity']) }}">{{ $droid['rarity'] }}</div>
-                    @endif
-                    
-                    @if($droid['found'])
-                        <a href="{{ route('registry.show', $droid['id']) }}" class="stretched-link"></a>
-                    @endif
-                </div>
+                        
+                        <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/storage/droids/{{ $droid['id'] }}/image.jpg" 
+                             onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder');"
+                             alt="{{ $droid['name'] }}" 
+                             class="droid-image">
+                        
+                        <div class="droid-name">{{ $droid['name'] }}</div>
+                        
+                        @if(isset($droid['rarity']))
+                            <div class="rarity-tag {{ strtolower($droid['rarity']) }}">{{ $droid['rarity'] }}</div>
+                        @endif
+                    </a>
+                @else
+                    <div class="droid-card locked">
+                        <img src="{{ $droid['placeholder'] ?? '/images/placeholders/astromech.png' }}" 
+                             alt="Locked" 
+                             class="droid-image placeholder">
+                        <div class="droid-name">{{ $droid['name'] }}</div>
+                        @if(isset($droid['rarity']))
+                            <div class="rarity-tag {{ strtolower($droid['rarity']) }}">{{ $droid['rarity'] }}</div>
+                        @endif
+                    </div>
+                @endif
             @empty
                 <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--card-bg); border-radius: 1rem; border: 1px dashed var(--accent);">
                     <p style="color: var(--text-secondary);">No public droids found in the registry.</p>
