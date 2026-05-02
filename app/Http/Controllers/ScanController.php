@@ -24,13 +24,23 @@ class ScanController extends Controller
         }
 
         if (Auth::check()) {
-            // Log the scan
-            DroidScan::updateOrCreate([
-                'user_id' => Auth::id(),
-                'droid_id' => $id,
-            ]);
+            // Log the encounter (once per day)
+            $existingScan = DroidScan::where('user_id', Auth::id())
+                ->where('droid_id', $id)
+                ->whereDate('created_at', now()->toDateString())
+                ->first();
 
-            return redirect()->route('registry.show', $id)->with('success', 'Droid added to your collection!');
+            if (!$existingScan) {
+                DroidScan::create([
+                    'user_id' => Auth::id(),
+                    'droid_id' => $id,
+                ]);
+                $message = 'Droid encountered!';
+            } else {
+                $message = 'You already spotted this droid today!';
+            }
+
+            return redirect()->route('registry.show', $id)->with('success', $message);
         }
 
         // If not logged in, store the scan in session and redirect to login

@@ -25,15 +25,18 @@
             @forelse($allDroids as $droid)
                 <div class="droid-card {{ $droid['found'] ? 'found' : 'locked' }}">
                     @if($droid['found'])
-                        <span class="found-badge">Found</span>
+                        <span class="found-badge">Spotted {{ $droid['encounters'] }}x</span>
                     @endif
                     
-                    <img src="{{ $droid['found'] ? ($droid['image'] ?? '/images/placeholder-droid.png') : ($droid['placeholder'] ?? '/images/placeholders/astromech.png') }}" 
+                    <img src="{{ $droid['found'] ? (rtrim(config('services.core_portal.url'), '/') . '/storage/droids/' . $droid['id'] . '/image.jpg') : ($droid['placeholder'] ?? '/images/placeholders/astromech.png') }}" 
                          alt="{{ $droid['name'] }}" 
                          class="droid-image {{ $droid['found'] ? '' : 'placeholder' }}">
                     
                     <div class="droid-name">{{ $droid['name'] }}</div>
-                    <div class="rarity-tag">{{ $droid['rarity'] ?? 'Common' }}</div>
+                    
+                    @if(isset($droid['rarity']))
+                        <div class="rarity-tag {{ strtolower($droid['rarity']) }}">{{ $droid['rarity'] }}</div>
+                    @endif
                     
                     @if($droid['found'])
                         <a href="{{ route('registry.show', $droid['id']) }}" class="stretched-link"></a>
