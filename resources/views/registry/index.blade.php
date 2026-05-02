@@ -29,6 +29,7 @@
                     @endif
                     
                     <img src="{{ $droid['found'] ? (rtrim(config('services.core_portal.url'), '/') . '/storage/droids/' . $droid['id'] . '/image.jpg') : ($droid['placeholder'] ?? '/images/placeholders/astromech.png') }}" 
+                         onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder');"
                          alt="{{ $droid['name'] }}" 
                          class="droid-image {{ $droid['found'] ? '' : 'placeholder' }}">
                     
