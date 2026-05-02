@@ -19,8 +19,17 @@
                 <h1 style="margin: 0; font-size: 2.5rem; color: var(--primary);">{{ $droid['name'] }}</h1>
                 <p style="color: var(--text-secondary);">
                     @php
-                        $encounters = \App\Models\DroidScan::where('user_id', Auth::id())
-                            ->where('droid_id', $droid['id'])
+                        $user = Auth::user();
+                        $visitorId = request()->cookie('visitor_id');
+                        $encounters = \App\Models\DroidScan::where('droid_id', $droid['id'])
+                            ->where(function($query) use ($user, $visitorId) {
+                                if ($user) {
+                                    $query->where('user_id', $user->id);
+                                }
+                                if ($visitorId) {
+                                    $query->orWhere('visitor_id', $visitorId);
+                                }
+                            })
                             ->count();
                     @endphp
                     Spotted {{ $encounters }}x (Last seen: {{ $scan->created_at->format('M j, Y') }})

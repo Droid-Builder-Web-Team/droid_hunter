@@ -14,7 +14,22 @@ class RegistryController extends Controller
      */
     public function index()
     {
-        $scans = DroidScan::where('user_id', Auth::id())->get()->groupBy('droid_id');
+        $user = auth()->user();
+        $visitorId = request()->cookie('visitor_id');
+        
+        // Fetch all scans for this user or device
+        $scans = DroidScan::where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->get()
+            ->groupBy('droid_id');
+
         $userScansIds = $scans->keys()->toArray();
         
         // Fetch all droids from Core Portal API
@@ -50,22 +65,31 @@ class RegistryController extends Controller
      */
     public function show($id)
     {
-        $scan = DroidScan::where('user_id', Auth::id())->where('droid_id', $id)->first();
+        $user = auth()->user();
+        $visitorId = request()->cookie('visitor_id');
+
+        $scan = DroidScan::where('droid_id', $id)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->latest()
+            ->first();
         
         if (!$scan) {
-            return redirect()->route('registry.index')->with('error', 'You haven\'t found this droid yet!');
+            return redirect()->route('registry.index')->with('error', 'You haven\'t spotted this droid yet!');
         }
 
-        $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
-        $response = Http::get($coreUrl . '/api/v1/droids/' . $id);
-        
-        if ($response->failed()) {
-            return redirect()->route('registry.index')->with('error', 'Could not fetch droid details from the portal.');
-        }
-
+        // Fetch rich data from Core Portal API
+        $response = Http::get(config('services.core_portal.url') . '/api/v1/droids/' . $id);
         $droid = $response->json();
 
-        // Calculate placeholder for this droid as a fallback
+        // Assign placeholder for fallback
         $clubName = $droid['club']['name'] ?? 'Generic';
         $droid['placeholder'] = match(true) {
             str_contains($clubName, 'R2 Builders') || str_contains($clubName, '39.1%') => asset('images/placeholders/astromech.png'),

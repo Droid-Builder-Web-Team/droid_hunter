@@ -11,41 +11,41 @@ class ScanController extends Controller
     /**
      * Process the scan from the Core Portal.
      */
-    public function process(Request $request, $id)
+    public function process(Request $request, $droidId, $hash)
     {
-        $signature = $request->query('signature');
+        $user = auth()->user();
+        $visitorId = $request->cookie('visitor_id');
+
+        // Verify hash matches droidId + secret
+        $expectedHash = hash_hmac('sha256', $droidId, config('services.core_portal.tag_secret'));
         
-        // Validate signature using the shared secret
-        $secret = config('services.core_portal.secret');
-        $expectedSignature = hash_hmac('sha256', $id, $secret);
-        
-        if ($signature !== $expectedSignature) {
-            abort(403, 'Invalid scan signature');
+        if (!hash_equals($expectedHash, $hash)) {
+            return redirect()->route('registry.index')->with('error', 'Invalid scan tag.');
         }
 
-        if (Auth::check()) {
-            // Log the encounter (once per day)
-            $existingScan = DroidScan::where('user_id', Auth::id())
-                ->where('droid_id', $id)
-                ->whereDate('created_at', now()->toDateString())
-                ->first();
+        // Check if already scanned today (by user or device)
+        $existing = DroidScan::where('droid_id', $droidId)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->whereDate('created_at', now()->toDateString())
+            ->exists();
 
-            if (!$existingScan) {
-                DroidScan::create([
-                    'user_id' => Auth::id(),
-                    'droid_id' => $id,
-                ]);
-                $message = 'Droid encountered!';
-            } else {
-                $message = 'You already spotted this droid today!';
-            }
-
-            return redirect()->route('registry.show', $id)->with('success', $message);
+        if (!$existing) {
+            DroidScan::create([
+                'user_id' => $user->id ?? null,
+                'visitor_id' => $visitorId,
+                'droid_id' => $droidId,
+            ]);
         }
 
-        // If not logged in, store the scan in session and redirect to login
-        session(['pending_scan' => $id]);
-        
-        return redirect()->route('login')->with('info', 'Please log in to add this droid to your collection.');
+        return redirect()->route('registry.show', $droidId)
+            ->with('success', 'Droid spotted!');
     }
 }
