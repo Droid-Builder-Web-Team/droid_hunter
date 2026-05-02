@@ -17,14 +17,35 @@ class RegistryController extends Controller
         $userScans = DroidScan::where('user_id', Auth::id())->pluck('droid_id')->toArray();
         
         // Fetch all droids from Core Portal API
-        $coreUrl = config('services.core_portal.url', 'http://localhost:8001');
+        $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
         $response = Http::get($coreUrl . '/api/v1/droids');
         
-        $allDroids = $response->json() ?? [];
+        $allDroids = [];
+        if ($response->successful()) {
+            $allDroids = $response->json() ?? [];
+            \Log::debug('Registry API Success:', ['count' => count($allDroids)]);
+        } else {
+            \Log::error('Registry Index API Failure:', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+        }
         
-        // Mark which ones are found
+        // Mark which ones are found and assign placeholders
         foreach ($allDroids as &$droid) {
             $droid['found'] = in_array($droid['id'], $userScans);
+            
+            if (!$droid['found']) {
+                $clubName = $droid['club']['name'] ?? 'Generic';
+                $droid['placeholder'] = match(true) {
+                    str_contains($clubName, 'R2 Builders') || str_contains($clubName, '39.1%') => asset('images/placeholders/astromech.png'),
+                    str_contains($clubName, 'BB-8') => asset('images/placeholders/bb8.png'),
+                    str_contains($clubName, 'MSE-6') => asset('images/placeholders/mouse.png'),
+                    str_contains($clubName, 'Protocol') => asset('images/placeholders/protocol.png'),
+                    str_contains($clubName, 'A-LT') => asset('images/placeholders/alt.png'),
+                    default => asset('images/placeholders/astromech.png'), // Default to astromech
+                };
+            }
         }
 
         return view('registry.index', compact('allDroids'));
@@ -41,9 +62,13 @@ class RegistryController extends Controller
             return redirect()->route('registry.index')->with('error', 'You haven\'t found this droid yet!');
         }
 
-        $coreUrl = config('services.core_portal.url', 'http://localhost:8001');
+        $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
         $response = Http::get($coreUrl . '/api/v1/droids/' . $id);
         
+        if ($response->failed()) {
+            return redirect()->route('registry.index')->with('error', 'Could not fetch droid details from the portal.');
+        }
+
         $droid = $response->json();
 
         return view('registry.show', compact('droid', 'scan'));

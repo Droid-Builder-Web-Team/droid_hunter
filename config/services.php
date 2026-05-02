@@ -37,6 +37,7 @@ return [
 
     'core_portal' => [
         'url' => env('CORE_PORTAL_URL', 'http://localhost:8001'),
+        'secret' => env('HUNTER_SHARED_SECRET'),
     ],
 
     'google' => [

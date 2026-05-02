@@ -15,11 +15,9 @@ class ScanController extends Controller
     {
         $signature = $request->query('signature');
         
-        // Validate signature using the shared APP_KEY (or a dedicated shared secret)
-        // For this to work easily, the user should set the same APP_KEY in both apps,
-        // or we use a separate HUNTER_SHARED_SECRET.
-        
-        $expectedSignature = hash_hmac('sha256', $id, config('app.key'));
+        // Validate signature using the shared secret
+        $secret = config('services.core_portal.secret');
+        $expectedSignature = hash_hmac('sha256', $id, $secret);
         
         if ($signature !== $expectedSignature) {
             abort(403, 'Invalid scan signature');

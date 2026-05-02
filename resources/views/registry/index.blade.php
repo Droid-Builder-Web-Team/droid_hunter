@@ -22,13 +22,15 @@
         </header>
 
         <div class="grid">
-            @foreach($allDroids as $droid)
+            @forelse($allDroids as $droid)
                 <div class="droid-card {{ $droid['found'] ? 'found' : 'locked' }}">
                     @if($droid['found'])
                         <span class="found-badge">Found</span>
                     @endif
                     
-                    <img src="{{ $droid['image'] ?? '/images/placeholder-droid.png' }}" alt="{{ $droid['name'] }}" class="droid-image">
+                    <img src="{{ $droid['found'] ? ($droid['image'] ?? '/images/placeholder-droid.png') : ($droid['placeholder'] ?? '/images/placeholders/astromech.png') }}" 
+                         alt="{{ $droid['name'] }}" 
+                         class="droid-image {{ $droid['found'] ? '' : 'placeholder' }}">
                     
                     <div class="droid-name">{{ $droid['name'] }}</div>
                     <div class="rarity-tag">{{ $droid['rarity'] ?? 'Common' }}</div>
@@ -37,7 +39,12 @@
                         <a href="{{ route('registry.show', $droid['id']) }}" class="stretched-link"></a>
                     @endif
                 </div>
-            @endforeach
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--card-bg); border-radius: 1rem; border: 1px dashed var(--accent);">
+                    <p style="color: var(--text-secondary);">No public droids found in the registry.</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Make sure droids are marked as "Public" in the Core Portal.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </body>
