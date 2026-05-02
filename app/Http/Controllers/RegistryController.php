@@ -15,7 +15,12 @@ class RegistryController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id');
+        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id') ?? session('visitor_id');
+        
+        \Log::error("DEBUG: Registry Index Hit", [
+            'user_id' => $user->id ?? 'GUEST',
+            'visitor_id' => $visitorId ?? 'NONE'
+        ]);
         
         // Fetch all scans for this user or device
         $scans = DroidScan::where(function($query) use ($user, $visitorId) {
@@ -65,15 +70,21 @@ class RegistryController extends Controller
      */
     public function show($id)
     {
+        $id = (int) $id;
         $user = auth()->user();
-        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id');
+        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id') ?? session('visitor_id');
+
+        \Log::error("DEBUG: Viewing Droid Details", [
+            'droid_id' => $id,
+            'user_id' => $user->id ?? 'GUEST',
+            'visitor_id' => $visitorId ?? 'NONE'
+        ]);
 
         $scan = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {
                 if ($user) {
                     $query->where('user_id', $user->id);
                 }
-                
                 if ($visitorId) {
                     $query->orWhere('visitor_id', $visitorId);
                 }
@@ -82,14 +93,21 @@ class RegistryController extends Controller
             ->first();
         
         if (!$scan) {
+            \Log::warning("Scan not found for user/guest", ['droid_id' => $id]);
             return redirect()->route('registry.index')->with('error', 'You haven\'t spotted this droid yet!');
         }
 
         // Fetch rich data from Core Portal API
         $response = Http::get(config('services.core_portal.url') . '/api/v1/droids/' . $id);
         
-        if ($response->failed() || !isset($response->json()['name'])) {
+        if ($response->failed()) {
+            \Log::error("API Request Failed", ['url' => config('services.core_portal.url') . '/api/v1/droids/' . $id, 'status' => $response->status()]);
             return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
+        }
+
+        if (!isset($response->json()['name'])) {
+            \Log::error("API Response Missing Name", ['data' => $response->json()]);
+            return redirect()->route('registry.index')->with('error', 'Droid data is incomplete.');
         }
 
         $droid = $response->json();

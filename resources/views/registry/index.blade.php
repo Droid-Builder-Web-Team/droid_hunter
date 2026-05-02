@@ -70,7 +70,10 @@
                 <a href="{{ route('privacy') }}" style="color: var(--text-secondary); text-decoration: none;">Privacy Policy</a>
                 <a href="{{ route('gdpr') }}" style="color: var(--text-secondary); text-decoration: none;">GDPR & Data</a>
             </div>
-            <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 1rem; opacity: 0.5;">Droid Hunter &bull; Built for Droid Builders UK</p>
+            <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 1rem; opacity: 0.5;">
+                Droid Hunter &bull; Built for Droid Builders UK<br>
+                <span style="opacity: 0.3;">COOKIE: {{ request()->cookie('visitor_id') ?? 'MISSING' }} | SESS: {{ session('visitor_id') ?? 'MISSING' }} | REQ: {{ request()->get('visitor_id') ?? 'NONE' }}</span>
+            </p>
         </footer>
     </div>
 </body>

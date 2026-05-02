@@ -9,12 +9,11 @@ use Illuminate\Support\Facades\Auth;
 class ScanController extends Controller
 {
     /**
-     * Process the scan from the Core Portal.
-     */
     public function process(Request $request, $id)
     {
+        $id = (int) $id;
         $user = auth()->user();
-        $visitorId = $request->cookie('visitor_id') ?? $request->get('visitor_id');
+        $visitorId = $request->cookie('visitor_id') ?? $request->get('visitor_id') ?? session('visitor_id');
         $signature = $request->query('signature');
 
         // Verify signature matches droid ID + secret
