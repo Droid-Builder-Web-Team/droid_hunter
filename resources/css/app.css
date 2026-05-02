@@ -63,8 +63,8 @@ body {
 }
 
 .droid-image.placeholder {
-    filter: grayscale(1) brightness(0.7);
-    opacity: 0.4;
+    filter: grayscale(1) brightness(1.2);
+    opacity: 0.7;
 }
 
 .droid-image {

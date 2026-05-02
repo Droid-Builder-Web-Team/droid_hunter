@@ -67,6 +67,17 @@ class RegistryController extends Controller
 
         $droid = $response->json();
 
+        // Calculate placeholder for this droid as a fallback
+        $clubName = $droid['club']['name'] ?? 'Generic';
+        $droid['placeholder'] = match(true) {
+            str_contains($clubName, 'R2 Builders') || str_contains($clubName, '39.1%') => asset('images/placeholders/astromech.png'),
+            str_contains($clubName, 'BB-8') => asset('images/placeholders/bb8.png'),
+            str_contains($clubName, 'MSE-6') => asset('images/placeholders/mouse.png'),
+            str_contains($clubName, 'Protocol') => asset('images/placeholders/protocol.png'),
+            str_contains($clubName, 'A-LT') => asset('images/placeholders/alt.png'),
+            default => asset('images/placeholders/astromech.png'),
+        };
+
         return view('registry.show', compact('droid', 'scan'));
     }
 }
