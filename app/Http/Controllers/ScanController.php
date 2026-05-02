@@ -14,11 +14,11 @@ class ScanController extends Controller
     public function process(Request $request, $id)
     {
         $user = auth()->user();
-        $visitorId = $request->cookie('visitor_id');
+        $visitorId = $request->cookie('visitor_id') ?? $request->get('visitor_id');
         $signature = $request->query('signature');
 
         // Verify signature matches droid ID + secret
-        $secret = config('services.core_portal.tag_secret');
+        $secret = config('services.core_portal.secret');
         $expectedSignature = hash_hmac('sha256', $id, $secret);
         
         if (!hash_equals($expectedSignature, (string) $signature)) {

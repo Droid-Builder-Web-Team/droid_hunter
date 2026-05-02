@@ -15,7 +15,7 @@ class RegistryController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $visitorId = request()->cookie('visitor_id');
+        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id');
         
         // Fetch all scans for this user or device
         $scans = DroidScan::where(function($query) use ($user, $visitorId) {
@@ -66,7 +66,7 @@ class RegistryController extends Controller
     public function show($id)
     {
         $user = auth()->user();
-        $visitorId = request()->cookie('visitor_id');
+        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id');
 
         $scan = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {

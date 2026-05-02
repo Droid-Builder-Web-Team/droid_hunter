@@ -22,6 +22,7 @@ class EnsureVisitorId
             
             // Inject into the current request so controllers can see it immediately
             $request->cookies->add(['visitor_id' => $visitorId]);
+            $request->offsetSet('visitor_id', $visitorId);
             
             $response = $next($request);
             
