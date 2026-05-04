@@ -13,7 +13,6 @@ Route::get('/api/intel', [App\Http\Controllers\RegistryController::class, 'getIn
 Route::get('/history', [App\Http\Controllers\RegistryController::class, 'history'])->name('registry.history');
 Route::get('/awards', [App\Http\Controllers\RegistryController::class, 'awards'])->name('registry.awards');
 Route::get('/registry/{id}', [App\Http\Controllers\RegistryController::class, 'show'])->name('registry.show');
-Route::get('/proxy-image', [App\Http\Controllers\RegistryController::class, 'proxyImage'])->name('proxy.image');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', function () {

@@ -146,36 +146,6 @@ class RegistryController extends Controller
         return null;
     }
 
-    /**
-     * Proxies images from the Core Portal to bypass CORS restrictions during share card generation.
-     */
-    public function proxyImage(Request $request)
-    {
-        $url = $request->query('url');
-        if (!$url) return response('Missing URL', 400);
-
-        \Log::info("Proxy: Attempting to fetch: " . $url);
-
-        try {
-            $response = Http::timeout(10)->get($url);
-
-            if (!$response->successful()) {
-                \Log::error("Proxy: Fetch failed for {$url}. Status: " . $response->status());
-                return response('Failed to fetch image', $response->status());
-            }
-
-            $contentType = $response->header('Content-Type') ?? 'image/png';
-            \Log::info("Proxy: Success! Content-Type: " . $contentType);
-
-            return response($response->body())
-                ->header('Content-Type', $contentType)
-                ->header('Cache-Control', 'public, max-age=86400');
-
-        } catch (\Exception $e) {
-            \Log::error("Proxy: Exception for {$url} - " . $e->getMessage());
-            return response('Error: ' . $e->getMessage(), 500);
-        }
-    }
 
     /**
      * Show detailed information for a specific droid.

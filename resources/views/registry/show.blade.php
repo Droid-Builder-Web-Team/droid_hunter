@@ -24,7 +24,7 @@
                 <div style="position: absolute; bottom: -10px; left: -10px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-left: 3px solid var(--primary);"></div>
                 <div style="position: absolute; bottom: -10px; right: -10px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-right: 3px solid var(--primary);"></div>
                 
-                <img src="{{ route('proxy.image', ['url' => rtrim(config('services.core_portal.url'), '/') . '/droid_image/' . $droid['id'] . '/photo_front/480']) }}" 
+                <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
                      onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"
                      alt="{{ $droid['name'] }}" style="width: 320px; height: 320px; object-fit: contain; position: relative; z-index: 5;">
             </div>
@@ -111,7 +111,8 @@
             <div style="text-align: center; color: #00f2ff; letter-spacing: 4px; font-weight: 700; font-size: 0.7rem; margin-bottom: 25px; opacity: 0.6;">DROID_HUNTER // SECURE_INTEL_LOG</div>
             
             <div style="width: 100%; height: 320px; background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative;">
-                <img id="capture-image" src="{{ route('proxy.image', ['url' => rtrim(config('services.core_portal.url'), '/') . '/droid_image/' . $droid['id'] . '/photo_front/480']) }}" 
+                <img id="capture-image" src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
+                     crossorigin="anonymous"
                      style="max-width: 90%; max-height: 90%; object-fit: contain;">
                 
                 <div style="position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
