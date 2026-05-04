@@ -272,22 +272,7 @@ class RegistryController extends Controller
             ->first();
         $currentEvent = $latestUserScan->event_name ?? 'SECTOR_UNKNOWN';
 
-        // Base64 encode the droid image to guarantee capture in the share card (bypasses all CORS)
-        $photoUrl = rtrim(config('services.core_portal.url'), '/') . '/droid_image/' . $id . '/photo_front/480';
-        $photoBase64 = null;
-        try {
-            $imageResponse = Http::get($photoUrl);
-            if ($imageResponse->successful()) {
-                $photoBase64 = 'data:' . $imageResponse->header('Content-Type') . ';base64,' . base64_encode($imageResponse->body());
-                \Log::info("Share Card: Photo fetch successful for droid {$id}");
-            } else {
-                \Log::warning("Share Card: Photo fetch failed (Status: " . $imageResponse->status() . ") for droid {$id}");
-            }
-        } catch (\Exception $e) {
-            \Log::error("Share Card: Photo fetch exception: " . $e->getMessage());
-        }
-
-        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent', 'photoBase64'));
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent'));
     }
 
     /**
@@ -406,33 +391,6 @@ class RegistryController extends Controller
         return view('registry.awards', compact('badges'));
     }
 
-    /**
-     * Proxies images from the Core Portal to bypass CORS restrictions during share card generation.
-     */
-    public function proxyImage(Request $request)
-    {
-        $url = $request->query('url');
-        if (!$url) return response('Missing URL', 400);
-
-        // Security: Only allow proxying from the configured Core Portal URL
-        $coreUrl = rtrim(config('services.core_portal.url'), '/');
-        if (!str_starts_with($url, $coreUrl)) {
-            return response('Unauthorized source', 403);
-        }
-
-        try {
-            $response = Http::get($url);
-            if (!$response->successful()) {
-                return response('Failed to fetch image', 500);
-            }
-
-            return response($response->body())
-                ->header('Content-Type', $response->header('Content-Type'))
-                ->header('Cache-Control', 'public, max-age=86400');
-        } catch (\Exception $e) {
-            return response('Error: ' . $e->getMessage(), 500);
-        }
-    }
 
     /**
      * Get the appropriate placeholder image for a droid based on its club/type.
