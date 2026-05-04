@@ -35,8 +35,8 @@
                     <a href="{{ route('registry.show', $droid['id']) }}" class="droid-card found text-decoration-none">
                         <span class="found-badge">Spotted {{ $droid['encounters'] }}x</span>
                         
-                        <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/storage/droids/{{ $droid['id'] }}/image.jpg" 
-                             onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder');"
+                        <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/240" 
+                             onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"
                              alt="{{ $droid['name'] }}" 
                              class="droid-image">
                         

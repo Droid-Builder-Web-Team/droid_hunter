@@ -11,7 +11,7 @@
         <a href="{{ route('registry.index') }}" style="color: var(--primary); text-decoration: none; margin-bottom: 2rem; display: inline-block;">&larr; Back to Registry</a>
         
         <div class="droid-card" style="padding: 2rem; display: flex; flex-direction: column; align-items: center; gap: 2rem;">
-            <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/storage/droids/{{ $droid['id'] }}/image.jpg" 
+            <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
                  onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"
                  alt="{{ $droid['name'] }}" style="width: 300px; height: 300px; object-fit: contain;">
             
