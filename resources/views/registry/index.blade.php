@@ -37,6 +37,17 @@
             <p>Scanning Sector: Local Registry // Database Online</p>
         </header>
 
+        @if($nearbyIntel)
+            <div style="background: rgba(0, 242, 255, 0.05); border: 1px solid var(--panel-border); padding: 0.8rem 1.5rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; position: relative; overflow: hidden;">
+                <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                <div style="font-size: 0.8rem; letter-spacing: 1px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                    <span style="color: var(--primary);">LIVE_INTEL:</span> 
+                    {{ $nearbyIntel['droid_name'] }} was spotted at <span style="color: var(--secondary);">{{ $nearbyIntel['event_name'] }}</span> {{ $nearbyIntel['time'] }}
+                </div>
+                <div style="position: absolute; right: 1rem; font-size: 0.7rem; color: var(--primary); opacity: 0.4; letter-spacing: 2px;">SECURE_FEED_ACTIVE</div>
+            </div>
+        @endif
+
         <div class="grid">
             @forelse($allDroids as $droid)
                 @if($droid['found'])

@@ -61,6 +61,7 @@ class ScanController extends Controller
                 'user_id' => $user->id ?? null,
                 'visitor_id' => $visitorId,
                 'droid_id' => $id,
+                'event_name' => $request->query('event'), // Capture event from Portal redirect
             ]);
         }
 

@@ -81,7 +81,45 @@ class RegistryController extends Controller
             $droid['placeholder'] = $this->getDroidPlaceholder($droid['club']['name'] ?? 'Generic');
         }
 
-        return view('registry.index', compact('allDroids'));
+        // Feature #4: Nearby Intel (Event-Aware version)
+        $latestUserScan = DroidScan::where(function($query) use ($user, $visitorId) {
+                if ($user) $query->where('user_id', $user->id);
+                if ($visitorId) $query->orWhere('visitor_id', $visitorId);
+            })
+            ->whereNotNull('event_name')
+            ->latest()
+            ->first();
+
+        $currentEvent = $latestUserScan->event_name ?? null;
+
+        // Fetch the latest scan globally, but prioritize the user's current event if known
+        $latestGlobalScan = DroidScan::when($currentEvent, function($q) use ($currentEvent) {
+                return $q->where('event_name', $currentEvent);
+            })
+            ->latest()
+            ->first();
+        
+        // Fallback to global latest if no scans found for the specific event
+        if (!$latestGlobalScan) {
+            $latestGlobalScan = DroidScan::latest()->first();
+        }
+
+        $nearbyIntel = null;
+        if ($latestGlobalScan) {
+            $matchedDroid = collect($allDroids)->firstWhere('id', $latestGlobalScan->droid_id);
+            if ($matchedDroid) {
+                $minutesAgo = $latestGlobalScan->created_at->diffInMinutes(now());
+                $timeString = $minutesAgo === 0 ? 'JUST NOW' : ($minutesAgo . 'm AGO');
+                
+                $nearbyIntel = [
+                    'droid_name' => $matchedDroid['name'],
+                    'event_name' => $latestGlobalScan->event_name ?? 'Somewhere in the Galaxy',
+                    'time' => $timeString
+                ];
+            }
+        }
+
+        return view('registry.index', compact('allDroids', 'nearbyIntel'));
     }
 
     /**

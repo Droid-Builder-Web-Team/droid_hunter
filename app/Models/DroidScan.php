@@ -27,5 +27,6 @@ class DroidScan extends Model
         'user_id',
         'visitor_id',
         'droid_id',
+        'event_name',
     ];
 }
