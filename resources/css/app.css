@@ -180,6 +180,7 @@ body::before {
     font-weight: 700;
     padding: 2px 6px;
     text-transform: uppercase;
+    z-index: 30;
 }
 
 .rarity-tag {
@@ -290,14 +291,14 @@ body::before {
 /* Card Ranks & Evolutions */
 .rank-badge {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    top: 35px;
+    left: 8px;
     font-size: 0.65rem;
     font-weight: 800;
     padding: 3px 8px;
     letter-spacing: 1px;
     clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-    z-index: 15;
+    z-index: 30;
 }
 
 .rank-bronze { 
