@@ -12,10 +12,19 @@ class RegistryController extends Controller
     /**
      * Show the user's droid collection.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $userId = Auth::id();
+        $visitorId = $request->cookie('visitor_id') ?? session('visitor_id');
+
+        // Safety Sync: If logged in, migrate any guest scans from this device
+        if ($userId && $visitorId) {
+            \App\Models\DroidScan::where('visitor_id', $visitorId)
+                ->whereNull('user_id')
+                ->update(['user_id' => $userId]);
+        }
+
         $user = auth()->user();
-        $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id') ?? session('visitor_id');
         
         \Log::error("DEBUG: Registry Index Hit", [
             'user_id' => $user->id ?? 'GUEST',
