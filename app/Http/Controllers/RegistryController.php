@@ -148,6 +148,33 @@ class RegistryController extends Controller
 
 
     /**
+     * Proxies images from the Core Portal to bypass CORS restrictions during share card generation.
+     */
+    public function proxyImage(Request $request)
+    {
+        $url = $request->query('url');
+        if (!$url) return response('Missing URL', 400);
+
+        try {
+            // Hunter app fetches from Portal (which is now public-friendly)
+            $response = Http::withHeaders([
+                'X-Hunter-Secret' => config('services.core_portal.secret'),
+            ])->timeout(15)->get($url);
+
+            if (!$response->successful()) {
+                return response('Failed to fetch image', $response->status());
+            }
+
+            return response($response->body())
+                ->header('Content-Type', $response->header('Content-Type') ?? 'image/png')
+                ->header('Cache-Control', 'public, max-age=86400');
+
+        } catch (\Exception $e) {
+            return response('Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Show detailed information for a specific droid.
      * 
      * Verifies the user has scanned the droid before showing rich details 
