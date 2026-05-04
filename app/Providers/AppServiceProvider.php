@@ -21,5 +21,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            function ($event) {
+                $visitorId = request()->cookie('visitor_id') ?? session('visitor_id');
+                if ($visitorId) {
+                    \App\Models\DroidScan::where('visitor_id', $visitorId)
+                        ->whereNull('user_id')
+                        ->update(['user_id' => $event->user->id]);
+                }
+            }
+        );
     }
 }
