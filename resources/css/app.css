@@ -1,128 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+
 :root {
-    --bg-color: #0a0a0c;
-    --card-bg: #16161a;
-    --primary: #00d4ff;
-    --secondary: #ff007a;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a8;
-    --accent: #2c2c34;
-    --success: #00ff95;
+    --bg-color: #05070a;
+    --panel-bg: rgba(16, 20, 25, 0.85);
+    --panel-border: #1e2631;
+    --primary: #00f2ff;
+    --primary-glow: rgba(0, 242, 255, 0.3);
+    --secondary: #ffaa00;
+    --secondary-glow: rgba(255, 170, 0, 0.3);
+    --text-primary: #e0faff;
+    --text-secondary: #708ea0;
+    --accent: #161d27;
+    --success: #00ffaa;
+    --danger: #ff3c3c;
 }
 
 body {
     background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #0a1018 0%, #05070a 100%),
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+    background-size: 100% 100%, 100% 4px, 3px 100%;
     color: var(--text-primary);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    letter-spacing: 0.5px;
+}
+
+/* Scanline Animation */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 1000;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    opacity: 0.4;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 2rem 1.5rem;
+    position: relative;
+    z-index: 10;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
+    position: relative;
 }
 
 .header h1 {
-    font-size: 2.5rem;
-    background: linear-gradient(45deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary);
+    text-shadow: 0 0 15px var(--primary-glow);
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+.header p {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 2rem;
 }
 
+/* Droid Card - The "Data-Pad" Look */
 .droid-card {
-    background: var(--card-bg);
-    border-radius: 1rem;
-    padding: 1rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 1.5rem;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid var(--accent);
     position: relative;
-    overflow: hidden;
+    clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     display: flex;
     flex-direction: column;
-    color: inherit;
     text-decoration: none;
 }
 
-a.droid-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    color: inherit;
+/* Corner Accents */
+.droid-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid var(--primary);
+    border-left: 2px solid var(--primary);
+    opacity: 0.5;
+}
+
+.droid-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-bottom: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+    opacity: 0.5;
+}
+
+.droid-card.found {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 15px var(--primary-glow);
+}
+
+.droid-card.found:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 25px var(--primary-glow), inset 0 0 20px var(--primary-glow);
 }
 
 .droid-card.locked {
-    border-style: dashed;
-}
-
-.droid-image.placeholder {
-    filter: grayscale(1) brightness(1.2);
-    opacity: 0.7;
+    opacity: 0.6;
+    filter: grayscale(0.8);
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(30, 38, 49, 0.5),
+        rgba(30, 38, 49, 0.5) 10px,
+        rgba(22, 29, 39, 0.5) 10px,
+        rgba(22, 29, 39, 0.5) 20px
+    );
 }
 
 .droid-image {
     width: 100%;
-    height: 120px;
+    height: 140px;
     object-fit: contain;
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+}
+
+.droid-card.found .droid-image {
+    filter: drop-shadow(0 0 15px var(--primary-glow));
+}
+
+.droid-card.locked .droid-image {
+    filter: brightness(0.5) contrast(1.2) sepia(1) hue-rotate(180deg);
 }
 
 .droid-name {
+    font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    position: relative;
-    z-index: 2;
-}
-
-.rarity-tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 2rem;
-    background: var(--accent);
-    color: var(--text-secondary);
-    position: relative;
-    z-index: 2;
-}
-
-.rarity-tag.legendary { background: #6a4c93; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
-.rarity-tag.rare { background: #a6611a; color: #fff; }
-.rarity-tag.uncommon { background: #457b9d; color: #fff; }
-.rarity-tag.common { background: #3d405b; color: #e0e1dd; }
-a.droid-card, a.droid-card:hover, a.droid-card:visited, a.droid-card:active {
-    color: var(--text-primary) !important;
-    text-decoration: none !important;
-}
-
-a.droid-card * {
-    text-decoration: none !important;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+    letter-spacing: 1px;
 }
 
 .found-badge {
     position: absolute;
-    top: 0.8rem;
-    left: 0.8rem;
-    background: var(--success);
-    color: var(--bg-color) !important;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.3rem;
+    top: 10px;
+    right: 10px;
+    background: var(--primary);
+    color: var(--bg-color);
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
     text-transform: uppercase;
-    z-index: 10; /* Force it to the very top */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    pointer-events: none; /* Let clicks pass through to the link */
 }
+
+.rarity-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.rarity-tag.legendary { color: #ffaa00; border-color: #ffaa00; text-shadow: 0 0 5px var(--secondary-glow); }
+.rarity-tag.rare { color: #ff4400; border-color: #ff4400; }
+.rarity-tag.uncommon { color: #00d4ff; border-color: #00d4ff; }
+.rarity-tag.common { color: #708ea0; border-color: #708ea0; }
+
+/* In-Universe Specs Grid for Detail View */
+.specs-grid {
+    border: 1px solid var(--panel-border);
+    background: rgba(0,0,0,0.3);
+}
+
+/* Profile/Auth Buttons */
+.btn-galactic {
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.btn-galactic:hover {
+    background: var(--primary);
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* Utils */
+.text-decoration-none { text-decoration: none !important; }
