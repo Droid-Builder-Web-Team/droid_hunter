@@ -27,10 +27,12 @@ The project includes a GitHub Action in `.github/workflows/codeql.yml`.
 
 ### What it does:
 - Scans every `push` and `pull_request` to the `master` branch.
+- **Languages**: Currently scans **JavaScript** (including PWA logic and Capture Card rendering).
+- **Note**: CodeQL does not currently support PHP. For PHP security scanning, consider tools like **Enlightn** (Laravel specific) or **Psalm**.
 - Checks for:
   - Hardcoded secrets/keys.
-  - SQL Injection vulnerabilities.
-  - Cross-site Scripting (XSS) in views.
+  - SQL Injection vulnerabilities (JS side).
+  - Cross-site Scripting (XSS) in frontend logic.
   - Insecure logic patterns.
 
 ### How to view results:
