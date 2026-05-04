@@ -233,7 +233,17 @@ class RegistryController extends Controller
         // Calculate total global encounters for this droid (Builder Recognition)
         $globalSpottedCount = DroidScan::where('droid_id', $id)->count();
 
-        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount'));
+        // Get the current event for the share card context
+        $latestUserScan = DroidScan::where(function($query) use ($user, $visitorId) {
+                if ($user) $query->where('user_id', $user->id);
+                if ($visitorId) $query->orWhere('visitor_id', $visitorId);
+            })
+            ->whereNotNull('event_name')
+            ->latest()
+            ->first();
+        $currentEvent = $latestUserScan->event_name ?? 'SECTOR_UNKNOWN';
+
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent'));
     }
 
     /**

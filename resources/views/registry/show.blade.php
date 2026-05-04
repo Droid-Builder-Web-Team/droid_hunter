@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $droid['name'] }} - Droid Hunter</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none" style="margin-bottom: 2rem;">&larr; NAV_BACK</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none">&larr; NAV_BACK</a>
+            <button onclick="shareDroid()" class="btn-galactic" style="background: var(--secondary); color: var(--bg-color); border-color: var(--secondary);">SHARE_INTEL</button>
+        </div>
         
         <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 2.5rem; position: relative; box-shadow: inset 0 0 20px var(--primary-glow);">
             <!-- Datapad Frame -->
@@ -100,5 +104,84 @@
             </div>
         </div>
     </div>
+
+    <!-- Hidden Share Template (Rendered off-screen) -->
+    <div id="share-card-wrapper" style="position: absolute; left: -9999px; top: 0;">
+        <div id="share-card" style="width: 400px; padding: 40px; background: #05070a; color: #e0faff; font-family: 'Rajdhani', sans-serif; position: relative; border: 2px solid var(--primary); box-shadow: inset 0 0 50px rgba(0, 242, 255, 0.1);">
+            <div style="text-align: center; color: var(--primary); letter-spacing: 4px; font-weight: 700; font-size: 0.7rem; margin-bottom: 25px; opacity: 0.6;">DROID_HUNTER // SECURE_INTEL_LOG</div>
+            
+            <div style="width: 100%; height: 320px; background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative;">
+                <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
+                     crossorigin="anonymous"
+                     style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                
+                <div style="position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <div class="crystal-icon rank-{{ strtolower($droid['rank']) }}" style="width: 18px; height: 30px;"></div>
+                    <div style="font-size: 0.6rem; font-weight: 800; color: #fff;">{{ $droid['rank'] }}</div>
+                </div>
+            </div>
+
+            <h1 style="margin: 0; color: var(--primary); text-align: center; font-size: 2.8rem; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px var(--primary-glow);">{{ $droid['name'] }}</h1>
+            
+            <div style="margin-top: 30px; border-top: 1px solid rgba(0, 242, 255, 0.1); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                 <div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Encounter Site</div>
+                    <div style="font-size: 1.1rem; color: var(--secondary); font-weight: 600; text-transform: uppercase;">{{ $currentEvent }}</div>
+                 </div>
+                 <div style="text-align: right;">
+                    <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Source Sector</div>
+                    <div style="font-size: 1.1rem; color: #fff; font-weight: 600; text-transform: uppercase;">{{ $droid['location']['county'] ?? 'UK' }}</div>
+                 </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center; border: 1px dashed rgba(0, 242, 255, 0.2); padding: 10px; opacity: 0.5;">
+                <div style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 3px;">Join the hunt at hunters.droidbuilders.uk</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function shareDroid() {
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = 'GENERATING...';
+            btn.disabled = true;
+
+            html2canvas(document.querySelector("#share-card"), {
+                backgroundColor: "#05070a",
+                scale: 2, // High resolution
+                useCORS: true, // Crucial for portal images
+                logging: false
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], 'droid-capture.png', { type: 'image/png' });
+                    
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: '{{ $droid['name'] }} Spotted!',
+                            text: 'I just spotted {{ $droid['name'] }} using the Droid Hunter app!'
+                        }).then(() => {
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                        }).catch(err => {
+                            downloadFallback(canvas, btn, originalText);
+                        });
+                    } else {
+                        downloadFallback(canvas, btn, originalText);
+                    }
+                });
+            });
+        }
+
+        function downloadFallback(canvas, btn, originalText) {
+            const link = document.createElement('a');
+            link.download = '{{ $droid['name'] }}-capture.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    </script>
 </body>
 </html>
