@@ -168,7 +168,10 @@ class RegistryController extends Controller
             ->latest()
             ->get();
 
-        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory'));
+        // Calculate total global encounters for this droid (Builder Recognition)
+        $globalSpottedCount = DroidScan::where('droid_id', $id)->count();
+
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount'));
     }
 
     /**

@@ -39,6 +39,18 @@
             </div>
 
             <div style="width: 100%;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 2rem; background: var(--panel-border); border: 1px solid var(--panel-border);">
+                    <div style="background: var(--panel-bg); padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Personal Spots</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">{{ $encounters }}x</div>
+                    </div>
+                    <div style="background: var(--panel-bg); padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Community Intel</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">{{ $globalSpottedCount }}x</div>
+                        <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.5rem; text-transform: uppercase;">Total Global Encounters</div>
+                    </div>
+                </div>
+
                 <div class="specs-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 1px; margin-bottom: 2.5rem; text-align: center;">
                     <div style="background: var(--bg-color); padding: 1.5rem;">
                         <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Mass</div>
