@@ -250,9 +250,12 @@ class RegistryController extends Controller
             $imageResponse = Http::get($photoUrl);
             if ($imageResponse->successful()) {
                 $photoBase64 = 'data:' . $imageResponse->header('Content-Type') . ';base64,' . base64_encode($imageResponse->body());
+                \Log::info("Share Card: Photo fetch successful for droid {$id}");
+            } else {
+                \Log::warning("Share Card: Photo fetch failed (Status: " . $imageResponse->status() . ") for droid {$id}");
             }
         } catch (\Exception $e) {
-            // Fallback to placeholder if fetch fails
+            \Log::error("Share Card: Photo fetch exception: " . $e->getMessage());
         }
 
         return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent', 'photoBase64'));
