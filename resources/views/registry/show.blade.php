@@ -111,8 +111,7 @@
             <div style="text-align: center; color: var(--primary); letter-spacing: 4px; font-weight: 700; font-size: 0.7rem; margin-bottom: 25px; opacity: 0.6;">DROID_HUNTER // SECURE_INTEL_LOG</div>
             
             <div style="width: 100%; height: 320px; background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative;">
-                <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
-                     crossorigin="anonymous"
+                <img src="{{ route('proxy.image', ['url' => rtrim(config('services.core_portal.url'), '/') . '/droid_image/' . $droid['id'] . '/photo_front/480']) }}" 
                      style="max-width: 90%; max-height: 90%; object-fit: contain;">
                 
                 <div style="position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; align-items: center; gap: 4px;">

@@ -363,6 +363,34 @@ class RegistryController extends Controller
     }
 
     /**
+     * Proxies images from the Core Portal to bypass CORS restrictions during share card generation.
+     */
+    public function proxyImage(Request $request)
+    {
+        $url = $request->query('url');
+        if (!$url) return response('Missing URL', 400);
+
+        // Security: Only allow proxying from the configured Core Portal URL
+        $coreUrl = rtrim(config('services.core_portal.url'), '/');
+        if (!str_starts_with($url, $coreUrl)) {
+            return response('Unauthorized source', 403);
+        }
+
+        try {
+            $response = Http::get($url);
+            if (!$response->successful()) {
+                return response('Failed to fetch image', 500);
+            }
+
+            return response($response->body())
+                ->header('Content-Type', $response->header('Content-Type'))
+                ->header('Cache-Control', 'public, max-age=86400');
+        } catch (\Exception $e) {
+            return response('Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Get the appropriate placeholder image for a droid based on its club/type.
      * 
      * Ensures consistent fallback silhouettes when primary photos are missing.
