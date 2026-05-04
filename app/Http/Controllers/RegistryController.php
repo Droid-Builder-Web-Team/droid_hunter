@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class RegistryController
@@ -59,11 +60,34 @@ class RegistryController extends Controller
         
         // Fetch the master list of public droids from the Core Portal API
         $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
-        $response = Http::get($coreUrl . '/api/v1/droids');
         
-        $allDroids = [];
-        if ($response->successful()) {
-            $allDroids = $response->json() ?? [];
+        // Cache the droid list for 1 hour to handle portal downtime/slowness
+        $allDroids = Cache::remember('all_droids_list', 3600, function() use ($coreUrl) {
+            try {
+                $response = Http::timeout(15) // Increased timeout
+                    ->retry(3, 100)           // Retry 3 times with 100ms delay
+                    ->get($coreUrl . '/api/v1/droids');
+                
+                if ($response->successful()) {
+                    return $response->json() ?? [];
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to connect to Core Portal: " . $e->getMessage());
+            }
+            return [];
+        });
+
+        // If cache returned empty (e.g. first run failed), try one more time without caching long-term
+        if (empty($allDroids)) {
+             try {
+                $response = Http::timeout(20)->get($coreUrl . '/api/v1/droids');
+                if ($response->successful()) {
+                    $allDroids = $response->json() ?? [];
+                    Cache::put('all_droids_list', $allDroids, 3600);
+                }
+            } catch (\Exception $e) {
+                Log::error("Secondary attempt failed: " . $e->getMessage());
+            }
         }
         
         // Process each droid: mark if found and assign appropriate UI placeholders/ranks
@@ -210,14 +234,20 @@ class RegistryController extends Controller
 
         // Fetch rich data from Core Portal API (specifications, backstory, etc)
         $coreUrl = rtrim(config('services.core_portal.url'), '/');
-        $response = Http::get($coreUrl . '/api/v1/droids/' . $id);
-        
-        if ($response->failed()) {
-            Log::error("API Request Failed", ['url' => $coreUrl . '/api/v1/droids/' . $id, 'status' => $response->status()]);
-            return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
-        }
+        $droid = null;
 
-        $droid = $response->json();
+        try {
+            $response = Http::timeout(10)->get($coreUrl . '/api/v1/droids/' . $id);
+            if ($response->successful()) {
+                $droid = $response->json();
+            } else {
+                Log::error("API Request Failed", ['url' => $coreUrl . '/api/v1/droids/' . $id, 'status' => $response->status()]);
+                return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to connect to Core Portal: " . $e->getMessage());
+            return redirect()->route('registry.index')->with('error', 'The Portal is currently offline. Please try again later.');
+        }
         
         if (!isset($droid['name'])) {
             Log::error("API Response Incomplete", ['data' => $droid]);
@@ -366,14 +396,19 @@ class RegistryController extends Controller
 
         // Fetch master list to map droid IDs to names and images
         $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
-        $response = Http::get($coreUrl . '/api/v1/droids');
         
-        $droids = [];
-        if ($response->successful()) {
-            $allDroids = $response->json() ?? [];
-            foreach ($allDroids as $d) {
-                $droids[$d['id']] = $d;
+        $allDroids = Cache::remember('all_droids_list', 3600, function() use ($coreUrl) {
+            try {
+                $response = Http::timeout(10)->get($coreUrl . '/api/v1/droids');
+                return $response->successful() ? ($response->json() ?? []) : [];
+            } catch (\Exception $e) {
+                return [];
             }
+        });
+
+        $droids = [];
+        foreach ($allDroids as $d) {
+            $droids[$d['id']] = $d;
         }
 
         // Decorate scan objects with droid metadata

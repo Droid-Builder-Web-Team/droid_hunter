@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encounter History - Droid Hunter</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
+@extends('layouts.app')
+
+@section('title', 'Encounter History - Droid Hunter')
+
+@section('content')
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none">&larr; NAV_BACK</a>
@@ -63,6 +59,4 @@
             </p>
         </footer>
     </div>
-
-</body>
-</html>
+@endsection

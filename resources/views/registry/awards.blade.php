@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galactic Awards - Droid Hunter</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
+@extends('layouts.app')
+
+@section('title', 'Galactic Awards - Droid Hunter')
+
+@section('content')
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none">&larr; NAV_BACK</a>
@@ -50,7 +46,9 @@
             </p>
         </footer>
     </div>
+@endsection
 
+@push('head')
     <style>
         .award-card.unlocked:hover {
             transform: translateY(-10px) scale(1.02);
@@ -68,5 +66,4 @@
             );
         }
     </style>
-</body>
-</html>
+@endpush

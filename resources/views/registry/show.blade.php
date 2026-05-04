@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $droid['name'] }} - Droid Hunter</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
+@extends('layouts.app')
+
+@section('title', $droid['name'] . ' - Droid Hunter')
+
+@section('content')
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none">&larr; NAV_BACK</a>
@@ -59,15 +54,15 @@
                 </div>
 
                 <div style="margin-bottom: 2.5rem; display: flex; gap: 1rem;">
-                    <button onclick="shareDroid()" class="btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem;">
+                    <button onclick="shareDroid()" class="btn-galactic" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; border: 1px solid var(--primary); color: var(--primary);">
                         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                         SHARE_INTEL
                     </button>
                     
                     <button id="commend-btn" onclick="commendBuilder()" 
-                            class="btn-secondary" 
+                            class="btn-galactic" 
                             {{ $hasCommended ? 'disabled' : '' }}
-                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; {{ $hasCommended ? 'opacity: 0.5; cursor: default;' : '' }}">
+                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; border-color: var(--secondary); color: var(--secondary); {{ $hasCommended ? 'opacity: 0.5; cursor: default;' : '' }}">
                         <svg width="18" height="18" fill="{{ $hasCommended ? '#ffd700' : 'currentColor' }}" viewBox="0 0 24 24">
                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                         </svg>
@@ -125,7 +120,7 @@
         </div>
     </div>
 
-    <!-- Hidden Share Template (Rendered off-screen but visible to the engine) -->
+    <!-- Hidden Share Template -->
     <div id="share-card-wrapper" style="position: absolute; left: -2000px; top: 0;">
         <div id="share-card" style="width: 400px; padding: 40px; background: #05070a; color: #e0faff; font-family: 'Rajdhani', sans-serif; position: relative; border: 2px solid #00f2ff; box-shadow: inset 0 0 50px rgba(0, 242, 255, 0.1);">
             <div style="text-align: center; color: #00f2ff; letter-spacing: 4px; font-weight: 700; font-size: 0.7rem; margin-bottom: 25px; opacity: 0.6;">DROID_HUNTER // SECURE_INTEL_LOG</div>
@@ -135,7 +130,6 @@
                      style="max-width: 90%; max-height: 90%; object-fit: contain;">
                 
                 <div style="position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                    <!-- SVG Crystal (Better compatibility) -->
                     <svg width="20" height="30" viewBox="0 0 24 36" fill="{{ $droid['rank'] == 'GOLD' ? '#ffd700' : ($droid['rank'] == 'SILVER' ? '#00f2ff' : '#ff8800') }}">
                         <path d="M12 0L24 9V27L12 36L0 27V9L12 0Z" />
                         <path d="M12 4L20 10V26L12 32L4 26V10L12 4Z" fill-opacity="0.3" />
@@ -162,7 +156,13 @@
             </div>
         </div>
     </div>
+@endsection
 
+@push('head')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+@endpush
+
+@push('scripts')
     <script>
         function shareDroid() {
             const btn = event.currentTarget;
@@ -170,7 +170,6 @@
             btn.innerText = 'GENERATING...';
             btn.disabled = true;
 
-            // Give the browser a moment to ensure the hidden template is rendered
             setTimeout(() => {
                 const captureElement = document.querySelector("#share-card");
                 
@@ -179,7 +178,7 @@
                     scale: 2,
                     useCORS: true,
                     allowTaint: true,
-                    logging: true
+                    logging: false
                 }).then(canvas => {
                     canvas.toBlob(blob => {
                         const file = new File([blob], 'droid-capture.png', { type: 'image/png' });
@@ -234,9 +233,6 @@
                     btn.style.opacity = '0.5';
                     btn.style.cursor = 'default';
                     document.getElementById('commendation-pill').innerHTML = '★ ' + data.count;
-                    
-                    // Subtle haptic or visual feedback
-                    btn.classList.add('pulse-cyan');
                 } else {
                     btn.disabled = false;
                     btn.innerHTML = 'ERROR';
@@ -250,5 +246,4 @@
             });
         }
     </script>
-</body>
-</html>
+@endpush
