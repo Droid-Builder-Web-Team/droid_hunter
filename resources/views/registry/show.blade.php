@@ -27,8 +27,10 @@
             
             <div style="text-align: center;">
                 <h1 style="margin: 0; font-size: 3.5rem; color: var(--primary); letter-spacing: 2px; text-shadow: 0 0 20px var(--primary-glow);">{{ $droid['name'] }}</h1>
-                <p style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem;">
-                    SCAN_FREQ: {{ $encounters }}x // LAST_LOCAL: {{ $scan->created_at->format('Y.m.d') }}
+                <p style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                    <span>SCAN_FREQ: {{ $encounters }}x</span>
+                    <span class="rank-badge rank-{{ strtolower($droid['rank']) }}" style="position: static; font-size: 0.8rem; padding: 4px 12px;">{{ $droid['rank'] }} RANK</span>
+                    <span>LAST_LOCAL: {{ $scan->created_at->format('Y.m.d') }}</span>
                 </p>
             </div>
 

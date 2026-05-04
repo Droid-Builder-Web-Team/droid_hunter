@@ -22,16 +22,17 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
+        // Global Login Listener: Automatically sync guest encounter data 
+        // to a user account the moment they sign in.
         \Illuminate\Support\Facades\Event::listen(
             \Illuminate\Auth\Events\Login::class,
             function ($event) {
                 $visitorId = request()->cookie('visitor_id') ?? session('visitor_id');
-                \Log::info("Login Sync Attempt", ['user' => $event->user->id, 'visitor_id' => $visitorId]);
+                
                 if ($visitorId) {
-                    $count = \App\Models\DroidScan::where('visitor_id', $visitorId)
+                    \App\Models\DroidScan::where('visitor_id', $visitorId)
                         ->whereNull('user_id')
                         ->update(['user_id' => $event->user->id]);
-                    \Log::info("Login Sync Complete", ['synced_count' => $count]);
                 }
             }
         );

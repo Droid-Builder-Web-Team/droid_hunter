@@ -8,6 +8,8 @@ A decoupled Progressive Web App (PWA) for event attendees to collect and registe
 - **The Great Sync**: Anonymous progress is automatically claimed and merged when a user registers or logs in.
 - **Active Member Filter**: The registry automatically filters out droids whose owners haven't attended an event in the last 2 years.
 - **Rich Droid Specs**: View detailed weight, speed, material, and origin (Country/County) for every droid.
+- **Encounter History**: Track every time you've spotted a droid with a full chronological log of your journey.
+- **Detailed Chronicles**: Dive into a specific droid's profile to see all the dates and times you've encountered that particular unit.
 - **Hunters Vault (Auth)**:
     - **Local Accounts**: Independent Email/Password registration.
     - **Data Links**: Social login support (Google/Apple).

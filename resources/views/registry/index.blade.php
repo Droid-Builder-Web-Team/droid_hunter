@@ -15,6 +15,7 @@
                     USER_IDENT: <span style="color: var(--primary);">{{ Auth::user()->name }}</span>
                 </div>
                 <div style="display: flex; gap: 1rem;">
+                    <a href="{{ route('registry.awards') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(255, 170, 0, 0.1); border-color: var(--secondary); color: var(--secondary);">AWARDS</a>
                     <a href="{{ route('registry.history') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 255, 0.1);">HISTORY</a>
                     <a href="{{ route('profile.show') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem;">PROFILE</a>
                     <form action="{{ route('logout') }}" method="POST" style="display: inline;">
@@ -25,6 +26,7 @@
             @else
                 <div style="color: var(--text-secondary); font-size: 1rem; letter-spacing: 1px; font-weight: 500;">GUEST_SESSION</div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{{ route('registry.awards') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(255, 170, 0, 0.1); border-color: var(--secondary); color: var(--secondary);">AWARDS</a>
                     <a href="{{ route('registry.history') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 255, 0.1);">HISTORY</a>
                     <a href="{{ route('login') }}" class="btn-galactic text-decoration-none" style="background: var(--primary); color: var(--bg-color);">SIGN IN TO SYNC</a>
                 </div>
@@ -38,8 +40,9 @@
         <div class="grid">
             @forelse($allDroids as $droid)
                 @if($droid['found'])
-                    <a href="{{ route('registry.show', $droid['id']) }}" class="droid-card found text-decoration-none">
+                    <a href="{{ route('registry.show', $droid['id']) }}" class="droid-card found rank-{{ strtolower($droid['rank']) }} text-decoration-none">
                         <span class="found-badge">Spotted {{ $droid['encounters'] }}x</span>
+                        <span class="rank-badge rank-{{ strtolower($droid['rank']) }}">{{ $droid['rank'] }}</span>
                         
                         <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/240" 
                              onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"

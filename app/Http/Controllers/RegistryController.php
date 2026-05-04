@@ -6,32 +6,42 @@ use App\Models\DroidScan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * Class RegistryController
+ * 
+ * Handles the display of the droid registry, individual droid details, 
+ * and the user's scan history.
+ */
 class RegistryController extends Controller
 {
     /**
-     * Show the user's droid collection.
+     * Show the user's droid collection (The Registry).
+     * 
+     * Fetches all scanned droids for the current user or guest session,
+     * cross-references them with the full droid list from the Core Portal,
+     * and handles guest-to-user data synchronization.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
         $userId = Auth::id();
         $visitorId = $request->cookie('visitor_id') ?? session('visitor_id');
 
-        // Safety Sync: If logged in, migrate any guest scans from this device
+        // Safety Sync: If a user has just logged in, migrate any guest scans 
+        // from this device/session to their permanent user account.
         if ($userId && $visitorId) {
-            \App\Models\DroidScan::where('visitor_id', $visitorId)
+            DroidScan::where('visitor_id', $visitorId)
                 ->whereNull('user_id')
                 ->update(['user_id' => $userId]);
         }
 
         $user = auth()->user();
         
-        \Log::error("DEBUG: Registry Index Hit", [
-            'user_id' => $user->id ?? 'GUEST',
-            'visitor_id' => $visitorId ?? 'NONE'
-        ]);
-        
-        // Fetch all scans for this user or device
+        // Fetch all local scan records for this user or device
         $scans = DroidScan::where(function($query) use ($user, $visitorId) {
                 if ($user) {
                     $query->where('user_id', $user->id);
@@ -46,7 +56,7 @@ class RegistryController extends Controller
 
         $userScansIds = $scans->keys()->toArray();
         
-        // Fetch all droids from Core Portal API
+        // Fetch the master list of public droids from the Core Portal API
         $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
         $response = Http::get($coreUrl . '/api/v1/droids');
         
@@ -55,10 +65,18 @@ class RegistryController extends Controller
             $allDroids = $response->json() ?? [];
         }
         
-        // Mark which ones are found and assign placeholders
+        // Process each droid: mark if found and assign appropriate UI placeholders/ranks
         foreach ($allDroids as &$droid) {
             $droid['found'] = in_array($droid['id'], $userScansIds);
             $droid['encounters'] = $droid['found'] ? count($scans[$droid['id']]) : 0;
+            
+            // Evolution Logic: Determine rank based on encounter count
+            $droid['rank'] = match(true) {
+                $droid['encounters'] >= 5 => 'GOLD',
+                $droid['encounters'] >= 3 => 'SILVER',
+                $droid['encounters'] >= 1 => 'BRONZE',
+                default => 'LOCKED',
+            };
             
             $droid['placeholder'] = $this->getDroidPlaceholder($droid['club']['name'] ?? 'Generic');
         }
@@ -67,7 +85,13 @@ class RegistryController extends Controller
     }
 
     /**
-     * Show details for a specific droid in the registry.
+     * Show detailed information for a specific droid.
+     * 
+     * Verifies the user has scanned the droid before showing rich details 
+     * fetched from the Core Portal.
+     *
+     * @param int|string $id The Droid ID
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
     public function show($id)
     {
@@ -75,12 +99,7 @@ class RegistryController extends Controller
         $user = auth()->user();
         $visitorId = request()->cookie('visitor_id') ?? request()->get('visitor_id') ?? session('visitor_id');
 
-        \Log::error("DEBUG: Viewing Droid Details", [
-            'droid_id' => $id,
-            'user_id' => $user->id ?? 'GUEST',
-            'visitor_id' => $visitorId ?? 'NONE'
-        ]);
-
+        // Verify the droid has been scanned by this user/device
         $scan = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {
                 if ($user) {
@@ -94,27 +113,27 @@ class RegistryController extends Controller
             ->first();
         
         if (!$scan) {
-            \Log::warning("Scan not found for user/guest", ['droid_id' => $id]);
+            Log::warning("Unauthorized detail view attempt", ['droid_id' => $id]);
             return redirect()->route('registry.index')->with('error', 'You haven\'t spotted this droid yet!');
         }
 
-        // Fetch rich data from Core Portal API
+        // Fetch rich data from Core Portal API (specifications, backstory, etc)
         $coreUrl = rtrim(config('services.core_portal.url'), '/');
         $response = Http::get($coreUrl . '/api/v1/droids/' . $id);
         
         if ($response->failed()) {
-            \Log::error("API Request Failed", ['url' => $coreUrl . '/api/v1/droids/' . $id, 'status' => $response->status()]);
+            Log::error("API Request Failed", ['url' => $coreUrl . '/api/v1/droids/' . $id, 'status' => $response->status()]);
             return redirect()->route('registry.index')->with('error', 'Droid data could not be retrieved from the Portal.');
         }
 
-        if (!isset($response->json()['name'])) {
-            \Log::error("API Response Missing Name", ['data' => $response->json()]);
+        $droid = $response->json();
+        
+        if (!isset($droid['name'])) {
+            Log::error("API Response Incomplete", ['data' => $droid]);
             return redirect()->route('registry.index')->with('error', 'Droid data is incomplete.');
         }
 
-        $droid = $response->json();
-
-        // Calculate encounters once here to keep the view clean
+        // Calculate total historical encounters for this droid
         $encounters = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {
                 if ($user) {
@@ -126,9 +145,17 @@ class RegistryController extends Controller
             })
             ->count();
 
-        // Assign placeholder for fallback
         $droid['placeholder'] = $this->getDroidPlaceholder($droid['club']['name'] ?? 'Generic');
 
+        // Evolution Logic: Determine rank based on encounter count
+        $droid['rank'] = match(true) {
+            $encounters >= 5 => 'GOLD',
+            $encounters >= 3 => 'SILVER',
+            $encounters >= 1 => 'BRONZE',
+            default => 'LOCKED',
+        };
+
+        // Fetch full chronological encounter history for this specific droid
         $scanHistory = DroidScan::where('droid_id', $id)
             ->where(function($query) use ($user, $visitorId) {
                 if ($user) {
@@ -145,7 +172,12 @@ class RegistryController extends Controller
     }
 
     /**
-     * Show the user's scan history.
+     * Show the user's full chronological scan history.
+     * 
+     * Displays every droid encounter recorded for the current user/device.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
     public function history(Request $request)
     {
@@ -163,7 +195,7 @@ class RegistryController extends Controller
             ->latest()
             ->get();
 
-        // Fetch all droids to get names/images
+        // Fetch master list to map droid IDs to names and images
         $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
         $response = Http::get($coreUrl . '/api/v1/droids');
         
@@ -175,7 +207,7 @@ class RegistryController extends Controller
             }
         }
 
-        // Attach droid info to scans
+        // Decorate scan objects with droid metadata
         foreach ($scans as $scan) {
             $droidData = $droids[$scan->droid_id] ?? null;
             if ($droidData) {
@@ -188,7 +220,80 @@ class RegistryController extends Controller
     }
 
     /**
-     * Get the appropriate placeholder image for a droid based on its club.
+     * Show the user's earned achievement badges (Awards).
+     * 
+     * Calculates badges based on scan history, such as first scan, 
+     * day streaks, and time-based challenges.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function awards(Request $request)
+    {
+        $user = auth()->user();
+        $visitorId = $request->cookie('visitor_id') ?? session('visitor_id');
+
+        $scans = DroidScan::where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })->get();
+
+        $totalScans = $scans->count();
+        $uniqueDroids = $scans->unique('droid_id')->count();
+        $uniqueDays = $scans->map(fn($s) => $s->created_at->toDateString())->unique()->count();
+        
+        $badges = [
+            [
+                'id' => 'first_scan',
+                'title' => 'First Contact',
+                'description' => 'Scanned your very first droid.',
+                'unlocked' => $totalScans >= 1,
+                'icon' => '🛰️'
+            ],
+            [
+                'id' => 'veteran',
+                'title' => 'Event Veteran',
+                'description' => 'Spotted droids on 3 different days.',
+                'unlocked' => $uniqueDays >= 3,
+                'icon' => '🎖️'
+            ],
+            [
+                'id' => 'collector',
+                'title' => 'Master Collector',
+                'description' => 'Registered 10 unique droids in your registry.',
+                'unlocked' => $uniqueDroids >= 10,
+                'icon' => '📦'
+            ],
+            [
+                'id' => 'early_bird',
+                'title' => 'Early Bird',
+                'description' => 'Scanned a droid before 10:00 AM.',
+                'unlocked' => $scans->contains(fn($s) => $s->created_at->hour < 10),
+                'icon' => '🌅'
+            ],
+            [
+                'id' => 'night_owl',
+                'title' => 'Night Owl',
+                'description' => 'Scanned a droid after 8:00 PM.',
+                'unlocked' => $scans->contains(fn($s) => $s->created_at->hour >= 20),
+                'icon' => '🌙'
+            ]
+        ];
+
+        return view('registry.awards', compact('badges'));
+    }
+
+    /**
+     * Get the appropriate placeholder image for a droid based on its club/type.
+     * 
+     * Ensures consistent fallback silhouettes when primary photos are missing.
+     * 
+     * @param string $clubName
+     * @return string URL to the placeholder image
      */
     private function getDroidPlaceholder($clubName)
     {
