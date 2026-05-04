@@ -177,9 +177,10 @@ class RegistryController extends Controller
 
         // Attach droid info to scans
         foreach ($scans as $scan) {
-            $scan->droid = $droids[$scan->droid_id] ?? null;
-            if ($scan->droid) {
-                $scan->droid['placeholder'] = $this->getDroidPlaceholder($scan->droid['club']['name'] ?? 'Generic');
+            $droidData = $droids[$scan->droid_id] ?? null;
+            if ($droidData) {
+                $droidData['placeholder'] = $this->getDroidPlaceholder($droidData['club']['name'] ?? 'Generic');
+                $scan->droid = $droidData;
             }
         }
 

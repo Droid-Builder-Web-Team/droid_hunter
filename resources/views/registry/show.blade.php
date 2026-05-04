@@ -75,7 +75,6 @@
                             <div class="encounter-log-card">
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Observation</div>
                                 <div style="font-weight: 700; color: var(--primary);">{{ $h->created_at->format('Y.m.d') }}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-secondary);">Time: {{ $h->created_at->format('H:i:s') }}</div>
                             </div>
                         @endforeach
                     </div>

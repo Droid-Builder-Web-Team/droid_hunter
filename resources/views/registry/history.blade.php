@@ -26,9 +26,8 @@
             @forelse($scans as $scan)
                 <div class="history-item">
                     <div class="scan-time">
-                        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Timestamp</div>
-                        <div style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">{{ $scan->created_at->format('H:i:s') }}</div>
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">{{ $scan->created_at->format('Y.m.d') }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Encounter Date</div>
+                        <div style="font-weight: 700; color: var(--primary); font-size: 1.3rem; letter-spacing: 1px;">{{ $scan->created_at->format('Y.m.d') }}</div>
                     </div>
 
                     @if($scan->droid)
