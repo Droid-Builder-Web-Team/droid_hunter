@@ -15,6 +15,7 @@
                     USER_IDENT: <span style="color: var(--primary);">{{ Auth::user()->name }}</span>
                 </div>
                 <div style="display: flex; gap: 1rem;">
+                    <a href="{{ route('registry.history') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 255, 0.1);">HISTORY</a>
                     <a href="{{ route('profile.show') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem;">PROFILE</a>
                     <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                         @csrf
@@ -23,7 +24,10 @@
                 </div>
             @else
                 <div style="color: var(--text-secondary); font-size: 1rem; letter-spacing: 1px; font-weight: 500;">GUEST_SESSION</div>
-                <a href="{{ route('login') }}" class="btn-galactic text-decoration-none" style="background: var(--primary); color: var(--bg-color);">SIGN IN TO SYNC</a>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="{{ route('registry.history') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 255, 0.1);">HISTORY</a>
+                    <a href="{{ route('login') }}" class="btn-galactic text-decoration-none" style="background: var(--primary); color: var(--bg-color);">SIGN IN TO SYNC</a>
+                </div>
             @endauth
         </div>
         <header class="header">

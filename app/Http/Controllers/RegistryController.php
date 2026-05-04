@@ -60,15 +60,7 @@ class RegistryController extends Controller
             $droid['found'] = in_array($droid['id'], $userScansIds);
             $droid['encounters'] = $droid['found'] ? count($scans[$droid['id']]) : 0;
             
-            $clubName = $droid['club']['name'] ?? 'Generic';
-            $droid['placeholder'] = match(true) {
-                str_contains($clubName, 'R2 Builders') || str_contains($clubName, '39.1%') => asset('images/placeholders/astromech.png'),
-                str_contains($clubName, 'BB-8') => asset('images/placeholders/bb8.png'),
-                str_contains($clubName, 'MSE-6') => asset('images/placeholders/mouse.png'),
-                str_contains($clubName, 'Protocol') => asset('images/placeholders/protocol.png'),
-                str_contains($clubName, 'A-LT') => asset('images/placeholders/alt.png'),
-                default => asset('images/placeholders/astromech.png'),
-            };
+            $droid['placeholder'] = $this->getDroidPlaceholder($droid['club']['name'] ?? 'Generic');
         }
 
         return view('registry.index', compact('allDroids'));
@@ -135,8 +127,71 @@ class RegistryController extends Controller
             ->count();
 
         // Assign placeholder for fallback
-        $clubName = $droid['club']['name'] ?? 'Generic';
-        $droid['placeholder'] = match(true) {
+        $droid['placeholder'] = $this->getDroidPlaceholder($droid['club']['name'] ?? 'Generic');
+
+        $scanHistory = DroidScan::where('droid_id', $id)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->latest()
+            ->get();
+
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory'));
+    }
+
+    /**
+     * Show the user's scan history.
+     */
+    public function history(Request $request)
+    {
+        $user = auth()->user();
+        $visitorId = $request->cookie('visitor_id') ?? session('visitor_id');
+
+        $scans = DroidScan::where(function($query) use ($user, $visitorId) {
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                if ($visitorId) {
+                    $query->orWhere('visitor_id', $visitorId);
+                }
+            })
+            ->latest()
+            ->get();
+
+        // Fetch all droids to get names/images
+        $coreUrl = rtrim(config('services.core_portal.url', 'http://localhost:8001'), '/');
+        $response = Http::get($coreUrl . '/api/v1/droids');
+        
+        $droids = [];
+        if ($response->successful()) {
+            $allDroids = $response->json() ?? [];
+            foreach ($allDroids as $d) {
+                $droids[$d['id']] = $d;
+            }
+        }
+
+        // Attach droid info to scans
+        foreach ($scans as $scan) {
+            $scan->droid = $droids[$scan->droid_id] ?? null;
+            if ($scan->droid) {
+                $scan->droid['placeholder'] = $this->getDroidPlaceholder($scan->droid['club']['name'] ?? 'Generic');
+            }
+        }
+
+        return view('registry.history', compact('scans'));
+    }
+
+    /**
+     * Get the appropriate placeholder image for a droid based on its club.
+     */
+    private function getDroidPlaceholder($clubName)
+    {
+        return match(true) {
             str_contains($clubName, 'R2 Builders') || str_contains($clubName, '39.1%') => asset('images/placeholders/astromech.png'),
             str_contains($clubName, 'BB-8') => asset('images/placeholders/bb8.png'),
             str_contains($clubName, 'MSE-6') => asset('images/placeholders/mouse.png'),
@@ -144,7 +199,5 @@ class RegistryController extends Controller
             str_contains($clubName, 'A-LT') => asset('images/placeholders/alt.png'),
             default => asset('images/placeholders/astromech.png'),
         };
-
-        return view('registry.show', compact('droid', 'scan', 'encounters'));
     }
 }

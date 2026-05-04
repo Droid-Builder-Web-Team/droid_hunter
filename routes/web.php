@@ -9,6 +9,7 @@ Route::get('/', function () {
 Route::get('/scan/{id}', [App\Http\Controllers\ScanController::class, 'process'])->name('scan.process');
 
 Route::get('/registry', [App\Http\Controllers\RegistryController::class, 'index'])->name('registry.index');
+Route::get('/history', [App\Http\Controllers\RegistryController::class, 'history'])->name('registry.history');
 Route::get('/registry/{id}', [App\Http\Controllers\RegistryController::class, 'show'])->name('registry.show');
 
 Route::middleware(['auth'])->group(function () {

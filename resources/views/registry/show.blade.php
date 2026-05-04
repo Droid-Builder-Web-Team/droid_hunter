@@ -67,6 +67,19 @@
                         </div>
                     </details>
                 </div>
+
+                <div style="margin-top: 3rem; border-top: 1px solid var(--panel-border); padding-top: 2rem;">
+                    <h3 style="color: var(--primary); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem;">// ENCOUNTER_LOGS</h3>
+                    <div class="encounter-logs-grid">
+                        @foreach($scanHistory as $h)
+                            <div class="encounter-log-card">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Observation</div>
+                                <div style="font-weight: 700; color: var(--primary);">{{ $h->created_at->format('Y.m.d') }}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">Time: {{ $h->created_at->format('H:i:s') }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </div>
