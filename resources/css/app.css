@@ -206,6 +206,7 @@ body::before {
 
 /* Profile/Auth Buttons */
 .btn-galactic {
+    display: inline-block;
     font-family: 'Rajdhani', sans-serif;
     text-transform: uppercase;
     font-weight: 700;
