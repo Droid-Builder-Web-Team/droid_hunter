@@ -24,7 +24,7 @@
                 <div style="position: absolute; bottom: -10px; left: -10px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-left: 3px solid var(--primary);"></div>
                 <div style="position: absolute; bottom: -10px; right: -10px; width: 40px; height: 40px; border-bottom: 3px solid var(--primary); border-right: 3px solid var(--primary);"></div>
                 
-                <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/480" 
+                <img src="{{ $photoBase64 ?? $droid['placeholder'] }}" 
                      onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"
                      alt="{{ $droid['name'] }}" style="width: 320px; height: 320px; object-fit: contain; position: relative; z-index: 5;">
             </div>
