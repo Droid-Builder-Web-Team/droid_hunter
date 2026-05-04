@@ -38,15 +38,42 @@
         </header>
 
         @if($nearbyIntel)
-            <div style="background: rgba(0, 242, 255, 0.05); border: 1px solid var(--panel-border); padding: 0.8rem 1.5rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; position: relative; overflow: hidden;">
+            <div id="intel-feed" style="background: rgba(0, 242, 255, 0.05); border: 1px solid var(--panel-border); padding: 0.8rem 1.5rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; position: relative; overflow: hidden;">
                 <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite;"></div>
                 <div style="font-size: 0.8rem; letter-spacing: 1px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
                     <span style="color: var(--primary);">LIVE_INTEL:</span> 
-                    {{ $nearbyIntel['droid_name'] }} was spotted at <span style="color: var(--secondary);">{{ $nearbyIntel['event_name'] }}</span> {{ $nearbyIntel['time'] }}
+                    <span id="intel-content">
+                        {{ $nearbyIntel['droid_name'] }} was spotted at <span style="color: var(--secondary);">{{ $nearbyIntel['event_name'] }}</span> {{ $nearbyIntel['time'] }}
+                    </span>
                 </div>
                 <div style="position: absolute; right: 1rem; font-size: 0.7rem; color: var(--primary); opacity: 0.4; letter-spacing: 2px;">SECURE_FEED_ACTIVE</div>
             </div>
         @endif
+
+        <script>
+            function updateIntel() {
+                fetch('{{ route('api.intel') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data) {
+                            const content = `${data.droid_name} was spotted at <span style="color: var(--secondary);">${data.event_name}</span> ${data.time}`;
+                            const container = document.getElementById('intel-content');
+                            if (container && container.innerHTML !== content) {
+                                container.style.opacity = 0;
+                                setTimeout(() => {
+                                    container.innerHTML = content;
+                                    container.style.opacity = 1;
+                                    container.style.transition = 'opacity 0.5s';
+                                }, 500);
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Intel feed error:', error));
+            }
+
+            // Poll every 30 seconds
+            setInterval(updateIntel, 30000);
+        </script>
 
         <div class="grid">
             @forelse($allDroids as $droid)
