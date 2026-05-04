@@ -14,6 +14,11 @@ A decoupled Progressive Web App (PWA) for event attendees to collect and registe
     - **Local Accounts**: Independent Email/Password registration.
     - **Data Links**: Social login support (Google/Apple).
     - **MFA Ready**: Built-in Multi-Factor Authentication support for maximum security.
+- **Community Engagement**:
+    - **Commendations**: Give "Digital High-Fives" to builders to recognize their work.
+    - **Social Capture Cards**: Generate and share beautiful capture cards with live droid photos, bypassing CORS/S3 restrictions via internal proxying.
+    - **Real-time Sync**: Automated background reporting of scans and commendations back to the Core Portal.
+    - **Web NFC Integration**: Support for writing droid URLs directly to NFC tags for easy field-deployment.
 - **PWA Ready**: Installable on iOS and Android with offline support and custom branding.
 
 ## 🛡️ Privacy & Security
@@ -22,6 +27,7 @@ A decoupled Progressive Web App (PWA) for event attendees to collect and registe
 - **No Marketing/Tracking**: No personal data is shared with third parties or used for marketing.
 - **GDPR Compliant**: Users have full control over their data, including a "Delete Everything" option.
 - **Signed Scans**: Uses HMAC-signed redirects from the Core Portal to ensure every "Spot" is authentic.
+- **Secret-Handshake Sync**: Cross-app API calls are protected by a shared secret (`HUNTER_SHARED_SECRET`) and IP validation.
 
 ## 🛠️ Installation
 
