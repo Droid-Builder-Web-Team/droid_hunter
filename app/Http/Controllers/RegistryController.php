@@ -243,7 +243,19 @@ class RegistryController extends Controller
             ->first();
         $currentEvent = $latestUserScan->event_name ?? 'SECTOR_UNKNOWN';
 
-        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent'));
+        // Base64 encode the droid image to guarantee capture in the share card (bypasses all CORS)
+        $photoUrl = rtrim(config('services.core_portal.url'), '/') . '/droid_image/' . $id . '/photo_front/480';
+        $photoBase64 = null;
+        try {
+            $imageResponse = Http::get($photoUrl);
+            if ($imageResponse->successful()) {
+                $photoBase64 = 'data:' . $imageResponse->header('Content-Type') . ';base64,' . base64_encode($imageResponse->body());
+            }
+        } catch (\Exception $e) {
+            // Fallback to placeholder if fetch fails
+        }
+
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent', 'photoBase64'));
     }
 
     /**
