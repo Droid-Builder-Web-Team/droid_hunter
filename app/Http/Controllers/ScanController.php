@@ -62,20 +62,26 @@ class ScanController extends Controller
                 'user_id' => $user->id ?? null,
                 'visitor_id' => $visitorId,
                 'droid_id' => $id,
-                'event_name' => $request->query('event'), // Capture event from Portal redirect
+                'event_name' => $request->query('event'),
             ]);
+        }
 
-            // Notify the Core Portal about the new global scan
-            try {
-                $coreUrl = rtrim(config('services.core_portal.url'), '/');
-                $secret = config('services.core_portal.secret');
-                
-                Http::withHeaders([
-                    'X-Hunter-Secret' => $secret,
-                ])->post($coreUrl . '/api/v1/droids/' . $id . '/scan');
-            } catch (\Exception $e) {
-                \Log::error("Failed to sync scan count to Portal: " . $e->getMessage());
+        // Notify the Core Portal about the scan (Every scan counts!)
+        try {
+            $coreUrl = rtrim(config('services.core_portal.url'), '/');
+            $secret = config('services.core_portal.secret');
+            
+            $response = Http::withHeaders([
+                'X-Hunter-Secret' => $secret,
+            ])->post($coreUrl . '/api/v1/droids/' . $id . '/scan');
+
+            if (!$response->successful()) {
+                \Log::error("Portal Sync Failed (Scan): " . $response->status() . " - " . $response->body());
+            } else {
+                \Log::info("Portal Sync Success (Scan) for Droid {$id}");
             }
+        } catch (\Exception $e) {
+            \Log::error("Failed to sync scan count to Portal: " . $e->getMessage());
         }
 
         return redirect()->route('registry.show', ['id' => $id, 'visitor_id' => $visitorId])

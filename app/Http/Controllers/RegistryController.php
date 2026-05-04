@@ -312,17 +312,22 @@ class RegistryController extends Controller
                 'visitor_id' => $visitorId,
             ]);
 
-            // Notify the Core Portal about the new commendation
+            // Notify the Core Portal about the new commendation (Always attempt sync)
             try {
                 $coreUrl = rtrim(config('services.core_portal.url'), '/');
                 $secret = config('services.core_portal.secret');
                 
-                Http::withHeaders([
+                $response = Http::withHeaders([
                     'X-Hunter-Secret' => $secret,
                 ])->post($coreUrl . '/api/v1/droids/' . $id . '/commend');
+
+                if (!$response->successful()) {
+                    \Log::error("Portal Sync Failed (Commend): " . $response->status() . " - " . $response->body());
+                } else {
+                    \Log::info("Portal Sync Success (Commend) for Droid {$id}");
+                }
             } catch (\Exception $e) {
                 \Log::error("Failed to sync commendation to Portal: " . $e->getMessage());
-                // We don't fail the local action if the portal sync fails
             }
 
             return response()->json([
@@ -330,6 +335,7 @@ class RegistryController extends Controller
                 'count' => DroidCommendation::where('droid_id', $id)->count()
             ]);
         } catch (\Exception $e) {
+            // Even if local record exists, we still try to return success if we reached this point
             return response()->json(['error' => 'You have already commended this builder.'], 422);
         }
     }
