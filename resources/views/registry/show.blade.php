@@ -51,8 +51,29 @@
                     <div style="background: var(--panel-bg); padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Community Intel</div>
                         <div style="font-size: 2rem; font-weight: 700; color: var(--secondary);">{{ $globalSpottedCount }}x</div>
-                        <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.5rem; text-transform: uppercase;">Total Global Encounters</div>
+                        <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 0.5rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span>Global Spots</span>
+                            <span style="color: var(--panel-border);">|</span>
+                            <span id="commendation-pill" style="color: #ffd700;">★ {{ $commendationsCount }}</span>
+                        </div>
                     </div>
+                </div>
+
+                <div style="margin-bottom: 2.5rem; display: flex; gap: 1rem;">
+                    <button onclick="shareDroid()" class="btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem;">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                        SHARE_INTEL
+                    </button>
+                    
+                    <button id="commend-btn" onclick="commendBuilder()" 
+                            class="btn-secondary" 
+                            {{ $hasCommended ? 'disabled' : '' }}
+                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; {{ $hasCommended ? 'opacity: 0.5; cursor: default;' : '' }}">
+                        <svg width="18" height="18" fill="{{ $hasCommended ? '#ffd700' : 'currentColor' }}" viewBox="0 0 24 24">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                        {{ $hasCommended ? 'COMMENDED' : 'COMMEND_BUILDER' }}
+                    </button>
                 </div>
 
                 <div class="specs-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 1px; margin-bottom: 2.5rem; text-align: center;">
@@ -190,6 +211,44 @@
             link.click();
             btn.innerText = originalText;
             btn.disabled = false;
+        }
+
+        function commendBuilder() {
+            const btn = document.getElementById('commend-btn');
+            if (btn.disabled) return;
+
+            btn.disabled = true;
+            btn.innerHTML = 'PROCESSING...';
+
+            fetch('{{ route("registry.commend", $droid["id"]) }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    btn.innerHTML = '<svg width="18" height="18" fill="#ffd700" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg> COMMENDED';
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'default';
+                    document.getElementById('commendation-pill').innerHTML = '★ ' + data.count;
+                    
+                    // Subtle haptic or visual feedback
+                    btn.classList.add('pulse-cyan');
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = 'ERROR';
+                    alert(data.error || 'Failed to commend builder.');
+                }
+            })
+            .catch(error => {
+                btn.disabled = false;
+                btn.innerHTML = 'RETRY';
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>

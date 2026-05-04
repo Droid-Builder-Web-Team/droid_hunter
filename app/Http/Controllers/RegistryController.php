@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DroidScan;
+use App\Models\DroidCommendation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -271,7 +272,53 @@ class RegistryController extends Controller
             ->first();
         $currentEvent = $latestUserScan->event_name ?? 'SECTOR_UNKNOWN';
 
-        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent'));
+        // Fetch commendation stats
+        $commendationsCount = DroidCommendation::where('droid_id', $id)->count();
+        $hasCommended = DroidCommendation::where('droid_id', $id)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) $query->where('user_id', $user->id);
+                if ($visitorId) $query->orWhere('visitor_id', $visitorId);
+            })
+            ->exists();
+
+        return view('registry.show', compact('droid', 'scan', 'encounters', 'scanHistory', 'globalSpottedCount', 'currentEvent', 'commendationsCount', 'hasCommended'));
+    }
+
+    /**
+     * Commend a builder for their droid.
+     */
+    public function commendDroid(Request $request, $id)
+    {
+        $id = (int) $id;
+        $user = auth()->user();
+        $visitorId = $request->cookie('visitor_id') ?? session('visitor_id');
+
+        // Verify the user has scanned this droid first
+        $hasScanned = DroidScan::where('droid_id', $id)
+            ->where(function($query) use ($user, $visitorId) {
+                if ($user) $query->where('user_id', $user->id);
+                if ($visitorId) $query->orWhere('visitor_id', $visitorId);
+            })
+            ->exists();
+
+        if (!$hasScanned) {
+            return response()->json(['error' => 'You must scan the droid before commending the builder.'], 403);
+        }
+
+        try {
+            DroidCommendation::create([
+                'droid_id' => $id,
+                'user_id' => $user->id ?? null,
+                'visitor_id' => $visitorId,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'count' => DroidCommendation::where('droid_id', $id)->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'You have already commended this builder.'], 422);
+        }
     }
 
     /**
