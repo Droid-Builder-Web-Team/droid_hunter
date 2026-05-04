@@ -300,27 +300,38 @@ body::before {
     z-index: 15;
 }
 
-.rank-bronze { background: #cd7f32; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
-.rank-silver { background: #c0c0c0; color: #000; box-shadow: 0 0 10px rgba(192, 192, 192, 0.4); }
+.rank-bronze { 
+    background: rgba(205, 127, 50, 0.2); 
+    color: #ffaa66; 
+    border: 1px solid rgba(205, 127, 50, 0.5);
+    text-shadow: 0 0 5px rgba(205, 127, 50, 0.5); 
+}
+.rank-silver { 
+    background: rgba(192, 192, 192, 0.15); 
+    color: #e2e8f0; 
+    border: 1px solid rgba(192, 192, 192, 0.4);
+    box-shadow: 0 0 10px rgba(192, 192, 192, 0.1); 
+}
 .rank-gold { 
-    background: #ffd700; 
-    color: #000; 
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    background: rgba(255, 215, 0, 0.15); 
+    color: #ffd700; 
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
     animation: gold-shimmer 2s infinite linear;
 }
 
 @keyframes gold-shimmer {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.3) contrast(1.2); }
-    100% { filter: brightness(1); }
+    0% { filter: brightness(1); opacity: 0.8; }
+    50% { filter: brightness(1.2) contrast(1.2); opacity: 1; }
+    100% { filter: brightness(1); opacity: 0.8; }
 }
 
 .droid-card.rank-gold {
-    border-color: #ffd700 !important;
-    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.2), 0 0 15px rgba(255, 215, 0, 0.1) !important;
+    border-color: rgba(255, 215, 0, 0.5) !important;
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1), 0 0 15px rgba(255, 215, 0, 0.05) !important;
 }
 
 .droid-card.rank-silver {
-    border-color: #c0c0c0 !important;
-    box-shadow: inset 0 0 15px rgba(192, 192, 192, 0.1) !important;
+    border-color: rgba(192, 192, 192, 0.4) !important;
+    box-shadow: inset 0 0 15px rgba(192, 192, 192, 0.05) !important;
 }
