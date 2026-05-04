@@ -29,7 +29,11 @@
                 <h1 style="margin: 0; font-size: 3.5rem; color: var(--primary); letter-spacing: 2px; text-shadow: 0 0 20px var(--primary-glow);">{{ $droid['name'] }}</h1>
                 <p style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;">
                     <span>SCAN_FREQ: {{ $encounters }}x</span>
-                    <span class="rank-badge rank-{{ strtolower($droid['rank']) }}" style="position: static; font-size: 0.8rem; padding: 4px 12px;">{{ $droid['rank'] }} RANK</span>
+                    <div class="rank-badge rank-{{ strtolower($droid['rank']) }}" style="position: static;"
+                         title="{{ $droid['rank'] }} RANK: You have recorded {{ $encounters }} encounters with this unit.">
+                        <div class="crystal-icon" style="margin: 0 auto;"></div>
+                        <span class="rank-text" style="font-size: 0.7rem;">{{ $droid['rank'] }} RANK</span>
+                    </div>
                     <span>LAST_LOCAL: {{ $scan->created_at->format('Y.m.d') }}</span>
                 </p>
             </div>

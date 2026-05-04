@@ -288,51 +288,58 @@ body::before {
     border-radius: 4px;
 }
 
-/* Card Ranks & Evolutions */
+/* Kyber Crystal Ranks */
 .rank-badge {
     position: absolute;
     top: 35px;
-    left: 8px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 3px 8px;
-    letter-spacing: 1px;
-    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+    left: 10px;
     z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
-.rank-bronze { 
-    background: rgba(205, 127, 50, 0.2); 
-    color: #ffaa66; 
-    border: 1px solid rgba(205, 127, 50, 0.5);
-    text-shadow: 0 0 5px rgba(205, 127, 50, 0.5); 
-}
-.rank-silver { 
-    background: rgba(192, 192, 192, 0.15); 
-    color: #e2e8f0; 
-    border: 1px solid rgba(192, 192, 192, 0.4);
-    box-shadow: 0 0 10px rgba(192, 192, 192, 0.1); 
-}
-.rank-gold { 
-    background: rgba(255, 215, 0, 0.15); 
-    color: #ffd700; 
-    border: 1px solid rgba(255, 215, 0, 0.4);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-    animation: gold-shimmer 2s infinite linear;
+.crystal-icon {
+    width: 14px;
+    height: 22px;
+    background: currentColor;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    filter: drop-shadow(0 0 10px currentColor);
+    transition: all 0.3s ease;
 }
 
-@keyframes gold-shimmer {
-    0% { filter: brightness(1); opacity: 0.8; }
-    50% { filter: brightness(1.2) contrast(1.2); opacity: 1; }
-    100% { filter: brightness(1); opacity: 0.8; }
+.rank-bronze { color: #ff8800; }
+.rank-silver { color: #00f2ff; }
+.rank-gold { color: #ffd700; }
+
+.rank-badge .rank-text {
+    font-size: 0.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    text-shadow: 0 0 5px currentColor;
+}
+
+.rank-badge.rank-gold .crystal-icon {
+    animation: crystal-pulse 2s infinite ease-in-out;
+}
+
+/* Tooltip System */
+.rank-badge[title] {
+    cursor: help;
+}
+
+@keyframes crystal-pulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px currentColor); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 15px currentColor); }
 }
 
 .droid-card.rank-gold {
-    border-color: rgba(255, 215, 0, 0.5) !important;
-    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1), 0 0 15px rgba(255, 215, 0, 0.05) !important;
+    border-color: rgba(255, 215, 0, 0.4) !important;
 }
 
 .droid-card.rank-silver {
-    border-color: rgba(192, 192, 192, 0.4) !important;
-    box-shadow: inset 0 0 15px rgba(192, 192, 192, 0.05) !important;
+    border-color: rgba(0, 242, 255, 0.3) !important;
 }

@@ -42,7 +42,11 @@
                 @if($droid['found'])
                     <a href="{{ route('registry.show', $droid['id']) }}" class="droid-card found rank-{{ strtolower($droid['rank']) }} text-decoration-none">
                         <span class="found-badge">Spotted {{ $droid['encounters'] }}x</span>
-                        <span class="rank-badge rank-{{ strtolower($droid['rank']) }}">{{ $droid['rank'] }}</span>
+                        <div class="rank-badge rank-{{ strtolower($droid['rank']) }}" 
+                             title="{{ $droid['rank'] }} RANK: This unit has been spotted {{ $droid['encounters'] }} times.">
+                            <div class="crystal-icon"></div>
+                            <span class="rank-text">{{ $droid['rank'] }}</span>
+                        </div>
                         
                         <img src="{{ rtrim(config('services.core_portal.url'), '/') }}/droid_image/{{ $droid['id'] }}/photo_front/240" 
                              onerror="this.src='{{ $droid['placeholder'] }}'; this.classList.add('placeholder-silhouette');"
