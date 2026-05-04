@@ -11,7 +11,6 @@
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none">&larr; NAV_BACK</a>
-            <button onclick="shareDroid()" class="btn-galactic" style="background: var(--secondary); color: var(--bg-color); border-color: var(--secondary);">SHARE_INTEL</button>
         </div>
         
         <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 2.5rem; position: relative; box-shadow: inset 0 0 20px var(--primary-glow);">
