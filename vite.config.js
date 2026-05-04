@@ -16,8 +16,8 @@ export default defineConfig({
                 name: 'Droid Hunter PWA',
                 short_name: 'DroidHunter',
                 description: 'Collect droids at events!',
-                theme_color: '#0a0a0c',
-                background_color: '#0a0a0c',
+                theme_color: '#05070a',
+                background_color: '#05070a',
                 display: 'standalone',
                 icons: [
                     {
@@ -31,7 +31,25 @@ export default defineConfig({
                         type: 'image/png'
                     }
                 ]
-            }
+            },
+            workbox: {
+                runtimeCaching: [
+                    {
+                        urlPattern: /^https:\/\/.*\.droidbuilders\.uk\/droid_image\/.*/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'droid-images-cache',
+                            expiration: {
+                                maxEntries: 200,
+                                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                        },
+                    },
+                ],
+            },
         }),
     ],
     server: {

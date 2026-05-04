@@ -10,7 +10,9 @@
     <div class="container">
         <a href="{{ route('registry.index') }}" class="btn-galactic text-decoration-none" style="margin-bottom: 2rem;">&larr; NAV_BACK</a>
         
-        <div class="droid-card found" style="padding: 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 2.5rem;">
+        <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 2.5rem; position: relative; box-shadow: inset 0 0 20px var(--primary-glow);">
+            <!-- Datapad Frame -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid var(--primary); opacity: 0.2; pointer-events: none;"></div>
             <div style="position: relative;">
                 <!-- Scanning Brackets -->
                 <div style="position: absolute; top: -10px; left: -10px; width: 40px; height: 40px; border-top: 3px solid var(--primary); border-left: 3px solid var(--primary);"></div>
