@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DroidScan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Class ScanController
@@ -63,6 +64,18 @@ class ScanController extends Controller
                 'droid_id' => $id,
                 'event_name' => $request->query('event'), // Capture event from Portal redirect
             ]);
+
+            // Notify the Core Portal about the new global scan
+            try {
+                $coreUrl = rtrim(config('services.core_portal.url'), '/');
+                $secret = config('services.core_portal.secret');
+                
+                Http::withHeaders([
+                    'X-Hunter-Secret' => $secret,
+                ])->post($coreUrl . '/api/v1/droids/' . $id . '/scan');
+            } catch (\Exception $e) {
+                \Log::error("Failed to sync scan count to Portal: " . $e->getMessage());
+            }
         }
 
         return redirect()->route('registry.show', ['id' => $id, 'visitor_id' => $visitorId])

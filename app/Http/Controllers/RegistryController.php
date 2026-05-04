@@ -312,6 +312,19 @@ class RegistryController extends Controller
                 'visitor_id' => $visitorId,
             ]);
 
+            // Notify the Core Portal about the new commendation
+            try {
+                $coreUrl = rtrim(config('services.core_portal.url'), '/');
+                $secret = config('services.core_portal.secret');
+                
+                Http::withHeaders([
+                    'X-Hunter-Secret' => $secret,
+                ])->post($coreUrl . '/api/v1/droids/' . $id . '/commend');
+            } catch (\Exception $e) {
+                \Log::error("Failed to sync commendation to Portal: " . $e->getMessage());
+                // We don't fail the local action if the portal sync fails
+            }
+
             return response()->json([
                 'success' => true,
                 'count' => DroidCommendation::where('droid_id', $id)->count()
