@@ -43,7 +43,6 @@
                 <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px;">Or use a data link</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                     <a href="{{ route('social.redirect', 'google') }}" style="flex: 1; text-align: center; padding: 0.7rem; border-radius: 0.5rem; background: #fff; color: #000; text-decoration: none; font-size: 0.8rem; font-weight: 600;">Google</a>
-                    <a href="{{ route('social.redirect', 'apple') }}" style="flex: 1; text-align: center; padding: 0.7rem; border-radius: 0.5rem; background: #000; color: #fff; border: 1px solid var(--accent); text-decoration: none; font-size: 0.8rem; font-weight: 600;">Apple</a>
                 </div>
             </div>
 
