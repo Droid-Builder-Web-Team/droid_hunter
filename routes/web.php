@@ -27,6 +27,12 @@ Route::middleware(['auth'])->group(function () {
         Auth::logout();
         return redirect()->route('login');
     })->name('logout');
+
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+        Route::get('/stats', [App\Http\Controllers\AdminController::class, 'index'])->name('stats');
+        Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
+        Route::post('/users/{id}/toggle-admin', [App\Http\Controllers\AdminController::class, 'toggleAdmin'])->name('users.toggle-admin');
+    });
 });
 
 Route::get('/login', function () {
