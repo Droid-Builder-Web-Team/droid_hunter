@@ -12,8 +12,11 @@ A decoupled Progressive Web App (PWA) for event attendees to collect and registe
 - **Detailed Chronicles**: Dive into a specific droid's profile to see all the dates and times you've encountered that particular unit.
 - **Hunters Vault (Auth)**:
     - **Local Accounts**: Independent Email/Password registration.
-    - **Data Links**: Social login support (Google/Apple).
+    - **Data Links**: Social login support (Google).
     - **MFA Ready**: Built-in Multi-Factor Authentication support for maximum security.
+- **Admin Command Center**:
+    - **Statistics Dashboard**: View detailed analytics on total droid spots, registered vs guest hunters, and event activity.
+    - **Hunter Registry (User Management)**: Search and manage administrative clearance levels for all users.
 - **Community Engagement**:
     - **Commendations**: Give "Digital High-Fives" to builders to recognize their work.
     - **Social Capture Cards**: Generate and share beautiful capture cards with live droid photos, bypassing CORS/S3 restrictions via internal proxying.
@@ -56,7 +59,22 @@ A decoupled Progressive Web App (PWA) for event attendees to collect and registe
    CORE_PORTAL_URL=https://portal.droidbuilders.uk
    ```
 
-5. **Build Assets:**
+5. **Google Login Setup (Optional):**
+   To enable Google authentication, set up OAuth credentials in the Google Cloud Console and add them to your `.env`:
+   ```env
+   GOOGLE_CLIENT_ID=your_client_id
+   GOOGLE_CLIENT_SECRET=your_client_secret
+   GOOGLE_REDIRECT_URL=https://yourdomain.com/auth/callback/google
+   ```
+
+6. **Admin Setup:**
+   To access the Command Center, you need to grant your user account admin privileges. You can do this via Artisan Tinker:
+   ```bash
+   php artisan tinker
+   > App\Models\User::where('email', 'your@email.com')->update(['is_admin' => true]);
+   ```
+
+7. **Build Assets:**
    ```bash
    npm run build
    ```
