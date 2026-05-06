@@ -20,11 +20,11 @@ class SocialController extends Controller
     {
         $socialUser = Socialite::driver($provider)->user();
 
-        $user = User::updateOrCreate([
+        $user = User::firstOrCreate([
             'email' => $socialUser->getEmail(),
         ], [
             'name' => $socialUser->getName(),
-            'password' => bcrypt(Str::random(16)), // Dummy password for social users
+            'password' => bcrypt(Str::random(16)), // Dummy password for new social users
         ]);
 
         Auth::login($user);
