@@ -10,6 +10,9 @@
                     USER_IDENT: <span style="color: var(--primary);">{{ Auth::user()->name }}</span>
                 </div>
                 <div style="display: flex; gap: 1rem;">
+                    @if(Auth::user()->is_admin)
+                        <a href="{{ route('admin.stats') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 170, 0.1); border-color: var(--success); color: var(--success);">COMMAND CENTER</a>
+                    @endif
                     <a href="{{ route('registry.awards') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(255, 170, 0, 0.1); border-color: var(--secondary); color: var(--secondary);">AWARDS</a>
                     <a href="{{ route('registry.history') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem; background: rgba(0, 255, 255, 0.1);">HISTORY</a>
                     <a href="{{ route('profile.show') }}" class="btn-galactic text-decoration-none" style="font-size: 0.8rem;">PROFILE</a>
